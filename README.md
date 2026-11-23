@@ -63,23 +63,23 @@ The gateway understands tool discovery, schemas, invocation and responses. It is
 |                            | Policy Engine     |                      |
 |                            +---+-----------+---+                      |
 |                                |           |                          |
-|                    ALLOW       |           | APPROVAL REQUIRED         |
+|                    ALLOW       |           | APPROVAL REQUIRED        |
 |                                v           v                          |
-|                    +----------------+  +-------------------+         |
-|                    | Upstream MCP   |  | Approval Manager  |         |
-|                    | Connection     |  +---------+---------+         |
-|                    | Manager        |            |                   |
-|                    +-------+--------+            |                   |
-|                            |                     |                   |
-|                            v                     v                   |
-|                    +----------------+    +-------------------+       |
-|                    | Data Guard /   |    | Human Approval    |       |
+|                    +----------------+  +-------------------+          |
+|                    | Upstream MCP   |  | Approval Manager  |          |
+|                    | Connection     |  +---------+---------+          |
+|                    | Manager        |            |                    |
+|                    +-------+--------+            |                    |
+|                            |                     |                    |
+|                            v                     v                    |
+|                    +----------------+    +-------------------+        |
+|                    | Data Guard /   |    | Human Approval     |       |
 |                    | DLP Inspection |    | Required           |       |
-|                    +-------+--------+    +-------------------+       |
-|                            |                                         |
-|                            v                                         |
+|                    +-------+--------+    +-------------------+        |
+|                            |                                          |
+|                            v                                          |
 |                    +----------------+                                 |
-|                    | Audit Engine   |<---- Blocked / approved events |
+|                    | Audit Engine   | <---- Blocked / approved events |
 |                    +----------------+                                 |
 +----------------------------+------------------------------------------+
                              |
