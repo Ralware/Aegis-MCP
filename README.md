@@ -1,7 +1,5 @@
 # AegisMCP — Architecture & Implementation Roadmap
 
-> **Diagram compatibility:** All architecture and workflow diagrams use plain-text ASCII inside fenced `text` blocks. They render consistently in GitHub, VS Code, editors and Markdown viewers without Mermaid support.
-
 > **Project objective:** Build an independent security gateway that sits between AI applications and their connected MCP servers, inspecting tool calls and responses, enforcing permissions, protecting sensitive information, and requiring human approval for high-risk operations.
 >
 > **Recommended architecture:** MCP-native security gateway  
