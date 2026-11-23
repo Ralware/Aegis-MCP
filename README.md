@@ -1,5 +1,7 @@
 # AegisMCP — Architecture & Implementation Roadmap
 
+> **Diagram compatibility:** All architecture and workflow diagrams use plain-text ASCII inside fenced `text` blocks. They render consistently in GitHub, VS Code, editors and Markdown viewers without Mermaid support.
+
 > **Project objective:** Build an independent security gateway that sits between AI applications and their connected MCP servers, inspecting tool calls and responses, enforcing permissions, protecting sensitive information, and requiring human approval for high-risk operations.
 >
 > **Recommended architecture:** MCP-native security gateway  
@@ -40,33 +42,64 @@ AegisMCP is an MCP-aware broker with two distinct interfaces:
 
 The gateway understands tool discovery, schemas, invocation and responses. It is not merely a generic HTTP proxy inspecting JSON-RPC traffic.
 
-```mermaid
-flowchart TB
-    AI[AI Application / MCP Host\nClaude · Compatible MCP host · Aegis demo assistant]
-    AI <-->|MCP · Streamable HTTP| GW
+```text
+                         +----------------------------------+
+                         |       AI APPLICATION / HOST      |
+                         | Claude / MCP-compatible client   |
+                         +----------------------------------+
+                                      |
+                         MCP over Streamable HTTP
+                                      |
+                                      v
++-----------------------------------------------------------------------+
+|                         AEGIS SECURITY GATEWAY                        |
+|                                                                       |
+|  +-------------------+      +-------------------+                     |
+|  | Request Inspector |----->| Threat Analyzer   |                     |
+|  +-------------------+      +---------+---------+                     |
+|                                       |                               |
+|                                       v                               |
+|                            +-------------------+                      |
+|                            | Policy Engine     |                      |
+|                            +---+-----------+---+                      |
+|                                |           |                          |
+|                    ALLOW       |           | APPROVAL REQUIRED         |
+|                                v           v                          |
+|                    +----------------+  +-------------------+         |
+|                    | Upstream MCP   |  | Approval Manager  |         |
+|                    | Connection     |  +---------+---------+         |
+|                    | Manager        |            |                   |
+|                    +-------+--------+            |                   |
+|                            |                     |                   |
+|                            v                     v                   |
+|                    +----------------+    +-------------------+       |
+|                    | Data Guard /   |    | Human Approval    |       |
+|                    | DLP Inspection |    | Required           |       |
+|                    +-------+--------+    +-------------------+       |
+|                            |                                         |
+|                            v                                         |
+|                    +----------------+                                 |
+|                    | Audit Engine   |<---- Blocked / approved events |
+|                    +----------------+                                 |
++----------------------------+------------------------------------------+
+                             |
+                     Approved MCP calls
+                             |
+          +------------------+-------------------+
+          |                  |                   |
+          v                  v                   v
+ +----------------+  +----------------+  +-------------------+
+ | Gmail MCP      |  | Drive MCP      |  | Calendar MCP      |
+ | Server         |  | Server         |  | Server            |
+ +-------+--------+  +-------+--------+  +---------+---------+
+         |                   |                     |
+         v                   v                     v
+ +----------------+  +----------------+  +-------------------+
+ | Google Gmail   |  | Google Drive   |  | Google Calendar   |
+ +----------------+  +----------------+  +-------------------+
 
-    subgraph GW[Aegis Security Gateway]
-      RI[Request Inspector]
-      TD[Threat Analyzer]
-      PE[Policy Engine]
-      DLP[Data Guard / DLP]
-      AP[Approval Manager]
-      AU[Audit Engine]
-      CM[Upstream MCP Connection Manager]
-      RI --> TD --> PE
-      PE -->|Allow| CM
-      PE -->|Approval required| AP
-      PE -->|Block| AU
-      CM --> DLP --> AU
-    end
-
-    CM <-->|MCP client connection| G[Gmail MCP Server]
-    CM <-->|MCP client connection| D[Drive MCP Server]
-    CM <-->|MCP client connection| C[Calendar MCP Server]
-
-    G --> GS[Google Gmail service]
-    D --> DS[Google Drive service]
-    C --> CS[Google Calendar service]
+NOTE: Every protected integration must be routed through Aegis.
+A server connected directly to the AI host can bypass this gateway.
 ```
 
 **Important deployment constraint:** The host must route all protected integrations through Aegis. An MCP server connected separately and directly to the AI host can bypass the gateway. Aegis cannot claim to protect connections it does not control.
@@ -190,16 +223,47 @@ Hash the complete tool definition, including schemas and annotations, not just t
 
 ### DLP Pipeline
 
-```mermaid
-flowchart TD
-    A[Raw content] --> B[Content extraction]
-    B --> C[Sensitive data detection]
-    C --> D[Classification]
-    D --> E[Policy evaluation]
-    E -->|Safe| F[Continue]
-    E -->|Sensitive| G[Mask / Block / Approval]
-    F --> H[Sanitized output]
-    G --> H
+```text
++------------------+
+|    Raw Content   |
++--------+---------+
+         |
+         v
++--------------------------+
+| Content Extraction       |
++------------+-------------+
+             |
+             v
++--------------------------+
+| Sensitive Data Detection |
++------------+-------------+
+             |
+             v
++--------------------------+
+| Data Classification      |
++------------+-------------+
+             |
+             v
++--------------------------+
+| Policy Evaluation        |
++-----+---------------+----+
+      |               |
+   SAFE          SENSITIVE
+      |               |
+      v               v
++-------------+  +--------------------------+
+| Continue    |  | Mask / Block / Approval  |
++------+------+  +------------+-------------+
+       |                      |
+       +----------+-----------+
+                  |
+                  v
+       +----------------------+
+       | Sanitized Output     |
+       +----------------------+
+                  |
+                  v
+          Return to AI Host
 ```
 
 ### Suggested Classification Levels
@@ -395,24 +459,23 @@ The following workflows define how the components interact and should guide back
 
 **Example user instruction:** “Find my latest train ticket in Gmail.”
 
-```mermaid
-sequenceDiagram
-    participant User
-    participant AI as AI Host
-    participant Aegis as Aegis Gateway
-    participant Threat as Threat / Policy Engine
-    participant Gmail as Gmail MCP
-    User->>AI: Find my latest train ticket
-    AI->>Aegis: gmail_search_emails(query)
-    Aegis->>Threat: Inspect identity, tool and arguments
-    Threat-->>Aegis: ALLOW
-    Aegis->>Gmail: Invoke search tool
-    Gmail-->>Aegis: Search results
-    Aegis->>Threat: Inspect response and sensitive data
-    Threat-->>Aegis: Sanitized response
-    Aegis-->>AI: Permitted result
-    Aegis->>Aegis: Record audit event
-    AI-->>User: Present ticket information
+```text
+USER                 AI HOST             AEGIS GATEWAY       THREAT / POLICY       GMAIL MCP
+ |                     |                       |                    |                 |
+ |-- Find train ------>|                       |                    |                 |
+ |                     |-- Search emails ----->|                    |                 |
+ |                     |                       |-- Inspect request ->|                |
+ |                     |                       |<------ ALLOW -------|                |
+ |                     |                       |---------------- Search tool -------->|
+ |                     |                       |<--------------- Search results ------|
+ |                     |                       |-- Inspect response ->|                |
+ |                     |                       |<-- Sanitized result -|                |
+ |                     |<-- Permitted result --|                    |                 |
+ |                     |                       |-- Record audit event                 |
+ |<-- Ticket details --|                       |                    |                 |
+ |                     |                       |                    |                 |
+
+All tool calls and responses pass through Aegis before reaching the AI or upstream service.
 ```
 
 Steps:
@@ -448,28 +511,28 @@ The document contains financial information.
 
 **Example:** “Send my bank statement to this external address.”
 
-```mermaid
-sequenceDiagram
-    participant AI as AI Host
-    participant Aegis as Aegis Gateway
-    participant Policy as Policy Engine
-    participant Approval as Approval Service
-    participant User
-    participant Gmail as Gmail MCP
-    AI->>Aegis: gmail_send_email(...)
-    Aegis->>Policy: Evaluate exact operation
-    Policy-->>Aegis: APPROVAL_REQUIRED
-    Aegis->>Approval: Create frozen operation + payload hash
-    Approval-->>Aegis: Pending request ID
-    Aegis-->>AI: Approval required; not executed
-    Approval->>User: Send approval notification
-    User->>Approval: Approve / Reject
-    Approval->>Aegis: Validated approval decision
-    Aegis->>Policy: Revalidate frozen operation and approval
-    Policy-->>Aegis: Authorized
-    Aegis->>Gmail: Execute exact approved operation
-    Gmail-->>Aegis: Execution result
-    Aegis-->>AI: Result/status
+```text
+AI HOST        AEGIS GATEWAY      POLICY ENGINE      APPROVAL SERVICE      USER       GMAIL MCP
+   |                 |                  |                   |                |             |
+   |-- send_email ->|                  |                   |                |             |
+   |                 |-- evaluate ---->|                   |                |             |
+   |                 |<-- APPROVAL ----|                   |                |             |
+   |                 |   REQUIRED      |                   |                |             |
+   |                 |-- freeze exact operation + payload hash ----------->|             |
+   |                 |<---------------- pending request ID ----------------|             |
+   |<-- approval required; operation NOT executed ---------|                |             |
+   |                 |                  |                   |-- notify ---->|             |
+   |                 |                  |                   |<-- approve / reject --------|
+   |                 |<--------------- validated decision --|                |             |
+   |                 |-- revalidate operation + approval ->|                |             |
+   |                 |<--------------- authorized ---------|                |             |
+   |                 |---------------------------------------------------- execute ----->|
+   |                 |<--------------------------------------------------- result --------|
+   |<-- result / status ----------------|                   |                |             |
+   |                 |                  |                   |                |             |
+
+If rejected, expired, modified, or already used: do not call Gmail.
+Approval is bound to the exact recipient, attachment, content and tool arguments.
 ```
 
 Steps:
@@ -915,20 +978,40 @@ This contract lets the frontend, security engine and gateway be developed indepe
 
 For the initial deployment, use Docker Compose. Kubernetes and distributed microservices are unnecessary for this project phase.
 
-```mermaid
-flowchart TB
-    subgraph DC[Docker Compose]
-      FE[Frontend\nReact dashboard]
-      BE[Backend\nFastAPI + MCP gateway + security modules]
-      PG[(PostgreSQL\nPolicies, approvals, audit)]
-      RD[(Redis\nTransient state and jobs)]
-      NW[Notification Worker\nApproval notifications and event processing]
-      FE <--> BE
-      BE <--> PG
-      BE <--> RD
-      RD --> NW
-      NW --> BE
-    end
+```text
++-------------------------------------------------------------------+
+|                        DOCKER COMPOSE                             |
+|                                                                   |
+|  +----------------------+       +-------------------------------+ |
+|  | Frontend             |<----->| Backend                       | |
+|  | React dashboard      |       | FastAPI                       | |
+|  |                      |       | MCP gateway                   | |
+|  +----------------------+       | Security modules              | |
+|                                 +---------------+---------------+ |
+|                                                 |                 |
+|                       +-------------------------+---------+       |
+|                       |                                   |       |
+|                       v                                   v       |
+|             +---------------------+             +----------------+|
+|             | PostgreSQL          |             | Redis          ||
+|             | Policies            |             | Transient      ||
+|             | Approvals           |             | state          ||
+|             | Audit records       |             | Background jobs||
+|             +---------------------+             +-------+--------+|
+|                                                         |         |
+|                                                         v         |
+|                                                +-----------------+|
+|                                                | Notification    ||
+|                                                | Worker          ||
+|                                                | Approval events ||
+|                                                +--------+--------+|
+|                                                         |         |
+|                                                         +-------> |
+|                                                   Backend         |
++-------------------------------------------------------------------+
+
+PostgreSQL stores durable records. Redis is for transient state and jobs.
+The notification worker reports delivery/status; it does not authorize actions.
 ```
 
 ### Development Environment
