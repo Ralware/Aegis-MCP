@@ -1,18 +1,18 @@
-# AegisMCP
+# Trust Gate
 
 **An independently enforced security gateway for AI agents using the Model Context Protocol (MCP).**
 
-AegisMCP sits between an AI application and the MCP servers it is allowed to use. It provides a central enforcement point for authenticated tool access, request and response inspection, deterministic authorization, sensitive-data protection, human approval, and security auditing.
+Trust Gate sits between an AI application and the MCP servers it is allowed to use. It provides a central enforcement point for authenticated tool access, request and response inspection, deterministic authorization, sensitive-data protection, human approval, and security auditing.
 
-> **Project status:** AegisMCP's architecture and implementation plan are defined. Treat capabilities as planned until they are implemented and verified by the project's tests. This README does not claim that the system is already production-ready or that prompt-injection and sensitive-data detection are infallible.
+> **Project status:** Trust Gate's architecture and implementation plan are defined. Treat capabilities as planned until they are implemented and verified by the project's tests. This README does not claim that the system is already production-ready or that prompt-injection and sensitive-data detection are infallible.
 
 ---
 
-## Why AegisMCP?
+## Why Trust Gate?
 
 AI agents can use connected tools to read information and perform consequential actions. A malicious instruction embedded in an email or document, excessive tool permissions, or an unintended operation can expose data or cause an external side effect.
 
-AegisMCP places an independently enforced security layer in the execution path:
+Trust Gate places an independently enforced security layer in the execution path:
 
 - Every protected tool invocation is authenticated and evaluated before execution.
 - The calling principal is derived from verified transport authentication, never from model-supplied arguments.
@@ -21,7 +21,7 @@ AegisMCP places an independently enforced security layer in the execution path:
 - High-risk operations require a human decision bound to the exact operation being authorized.
 - Decisions and execution outcomes are recorded as sanitized audit events.
 
-**Core principle:** AegisMCP must enforce security independently of the AI model. An LLM may assist with analysis, but it must never make the final authorization decision.
+**Core principle:** Trust Gate must enforce security independently of the AI model. An LLM may assist with analysis, but it must never make the final authorization decision.
 
 ## How it works
 
@@ -31,7 +31,7 @@ AegisMCP places an independently enforced security layer in the execution path:
              Authenticated MCP request
                         |
                         v
-               AEGISMCP GATEWAY
+               TRUST GATE SECURITY GATEWAY
                         |
           +-------------+--------------+
           |                            |
@@ -66,12 +66,12 @@ AegisMCP places an independently enforced security layer in the execution path:
         taint, approvals, invocations and audit events
 ```
 
-AegisMCP uses an MCP-native broker architecture:
+Trust Gate uses an MCP-native broker architecture:
 
 - **Northbound:** exposes a protected MCP interface to an AI application or MCP-compatible host.
 - **Southbound:** maintains MCP client connections to approved upstream MCP servers.
 
-All integrations that AegisMCP is expected to protect must be routed through it. An MCP server connected directly to the AI host can bypass the gateway and is outside AegisMCP's enforcement boundary.
+All integrations that Trust Gate is expected to protect must be routed through it. An MCP server connected directly to the AI host can bypass the gateway and is outside Trust Gate's enforcement boundary.
 
 ## Core security capabilities
 
@@ -104,12 +104,12 @@ Use `(server_id, upstream_tool_name)` as the canonical internal tool identity. S
 
 The hackathon deliverable is a deliberately narrow, end-to-end vertical slice. It should prove the security properties before the project expands into a complete integration platform.
 
-1. An MCP client authenticates to AegisMCP.
-2. Aegis discovers and exposes approved tools from controlled mock Gmail and Drive MCP servers.
+1. An MCP client authenticates to Trust Gate.
+2. Trust Gate discovers and exposes approved tools from controlled mock Gmail and Drive MCP servers.
 3. Every invocation passes through one centralized execution pipeline.
 4. A confidential document is inspected and sanitized before its content reaches the AI host; its stable artifact identity, provenance, and classification are recorded.
 5. An outbound operation resolves attachment IDs and checks their ownership, provenance, and taint before policy evaluation.
-6. Aegis requires approval for a high-risk external send before calling the upstream send tool.
+6. Trust Gate requires approval for a high-risk external send before calling the upstream send tool.
 7. Rejection leaves the upstream execution counter unchanged. A separately approved frozen operation executes at most once in the controlled test environment.
 8. A minimal authenticated dashboard displays approval requests and persisted audit activity.
 9. A scripted MCP demo client reproduces the complete scenario without relying on unpredictable LLM behaviour.
@@ -137,7 +137,7 @@ Pin dependency versions and the MCP protocol/client compatibility target during 
 The repository is expected to evolve as the implementation is scaffolded. The proposed documentation and planning layout is:
 
 ```text
-aegismcp/
+trust-gate/
 ├── README.md
 ├── docs/
 │   ├── ARCHITECTURE.md
@@ -147,8 +147,8 @@ aegismcp/
 │   ├── THREAT_MODEL.md
 │   └── DEMO_GUIDE.md
 ├── planning/
-│   ├── AegisMCP_Full_Product_Roadmap.md
-│   └── AegisMCP_Hackathon_MVP_Tracker.md
+│   ├── Trust_Gate_Full_Product_Roadmap.md
+│   └── Trust_Gate_Hackathon_MVP_Tracker.md
 ├── backend/
 ├── frontend/
 ├── mock_servers/
@@ -162,8 +162,8 @@ Keep the detailed architecture in `docs/ARCHITECTURE.md`. The full product roadm
 
 ## Documentation and planning
 
-- **[Full Product Roadmap](planning/AegisMCP_Full_Product_Roadmap.md)** — corrected long-term architecture, complete product scope, database and API design, security requirements, testing, deployment, and post-MVP backlog.
-- **[Hackathon MVP Tracker](planning/AegisMCP_Hackathon_MVP_Tracker.md)** — focused implementation work packages, timeboxes, acceptance criteria, security test matrix, and demonstration runbook.
+- **[Full Product Roadmap](planning/Trust_Gate_Full_Product_Roadmap.md)** — corrected long-term architecture, complete product scope, database and API design, security requirements, testing, deployment, and post-MVP backlog.
+- **[Hackathon MVP Tracker](planning/Trust_Gate_Hackathon_MVP_Tracker.md)** — focused implementation work packages, timeboxes, acceptance criteria, security test matrix, and demonstration runbook.
 - **[Architecture](docs/ARCHITECTURE.md)** — detailed system components, data flows, and technical decisions. Create or maintain this document as the canonical architecture reference.
 - **[Security Design](docs/SECURITY_DESIGN.md)** — identity, authorization, response inspection, taint tracking, approval integrity, and fail-closed requirements.
 - **[Database Schema](docs/DATABASE_SCHEMA.md)** — persistent models, relationships, constraints, and state machines.
@@ -213,7 +213,7 @@ These are project requirements, not optional UI features:
 - **Fail-closed execution:** If authentication, policy enforcement, required inspection, or approval verification is unavailable, do not perform the protected operation.
 - **Tool integrity:** Review tool metadata on initial registration. Reconcile tool definitions after change notifications and on reconnect/refresh; quarantine unreviewed or changed definitions according to policy.
 - **Audit hygiene:** Persist security decisions and execution outcomes without logging raw credentials or unnecessary sensitive document content.
-- **No bypass claims:** AegisMCP only protects integrations actually routed through its gateway.
+- **No bypass claims:** Trust Gate only protects integrations actually routed through its gateway.
 
 ## Demonstration
 
@@ -224,7 +224,7 @@ The planned demonstration should show the following sequence using synthetic dat
 3. A retrieved artifact is registered with a stable ID and `CONFIDENTIAL` classification.
 4. A malicious email is flagged and treated as untrusted content.
 5. A send operation references the confidential artifact by ID and targets an external recipient.
-6. Aegis requires approval before upstream execution. Rejecting the request leaves the mock Gmail send counter at zero.
+6. Trust Gate requires approval before upstream execution. Rejecting the request leaves the mock Gmail send counter at zero.
 7. A separate exact operation is approved, verified, and executed once.
 8. The dashboard shows the authenticated principal, artifact classification, policy decision, approval decision, execution outcome, and audit evidence.
 
@@ -232,9 +232,9 @@ Use a scripted MCP demo client so the sequence is repeatable. An LLM-powered hos
 
 ## Limitations and responsible claims
 
-AegisMCP is an enforcement gateway, not a guarantee that every malicious instruction or sensitive value can be detected. Prompt-injection inspection and automated PII recognition are imperfect. The primary protection is independent backend authorization, least privilege, artifact-aware outbound checks, response inspection, exact-operation approval, and fail-closed behaviour when mandatory controls are unavailable.
+Trust Gate is an enforcement gateway, not a guarantee that every malicious instruction or sensitive value can be detected. Prompt-injection inspection and automated PII recognition are imperfect. The primary protection is independent backend authorization, least privilege, artifact-aware outbound checks, response inspection, exact-operation approval, and fail-closed behaviour when mandatory controls are unavailable.
 
-AegisMCP cannot protect a connection that bypasses its gateway. External services may also have ambiguous outcomes after network failures; record an `UNKNOWN` or `RECONCILIATION_REQUIRED` state rather than blindly retrying a potentially completed side effect. Do not claim production-grade security until the relevant controls have been implemented, tested, audited, and independently reviewed.
+Trust Gate cannot protect a connection that bypasses its gateway. External services may also have ambiguous outcomes after network failures; record an `UNKNOWN` or `RECONCILIATION_REQUIRED` state rather than blindly retrying a potentially completed side effect. Do not claim production-grade security until the relevant controls have been implemented, tested, audited, and independently reviewed.
 
 ## Development references
 
@@ -251,4 +251,4 @@ AegisMCP cannot protect a connection that bypasses its gateway. External service
 
 ---
 
-**AegisMCP development rule:** Prove authenticated gateway interception and upstream blocking first. Then prove response withholding and artifact taint. Then prove exact-operation approval. Expand the product only after these security properties are demonstrated with repeatable tests and evidence.
+**Trust Gate development rule:** Prove authenticated gateway interception and upstream blocking first. Then prove response withholding and artifact taint. Then prove exact-operation approval. Expand the product only after these security properties are demonstrated with repeatable tests and evidence.

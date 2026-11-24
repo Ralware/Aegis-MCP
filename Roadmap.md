@@ -1,14 +1,14 @@
-# AegisMCP — Full Product Roadmap & Corrected Architecture
+# Trust Gate — Full Product Roadmap & Corrected Architecture
 
-> **Project:** AegisMCP — MCP Security Gateway and AI Agent Governance Platform  
-> **Purpose:** The canonical long-term product backlog and architecture reference for building, testing, auditing, deploying, and evolving AegisMCP. Use the companion `AegisMCP_Hackathon_MVP_Tracker.md` for the deliberately smaller hackathon scope.  
+> **Project:** Trust Gate — MCP Security Gateway and AI Agent Governance Platform  
+> **Purpose:** The canonical long-term product backlog and architecture reference for building, testing, auditing, deploying, and evolving Trust Gate. Use the companion `Trust_Gate_Hackathon_MVP_Tracker.md` for the deliberately smaller hackathon scope.  
 > **Project objective:** Place an independently enforced security gateway between AI applications and their connected MCP servers. Inspect tool calls and responses, enforce permissions, protect sensitive information, and require human approval for high-risk operations.
 
 ---
 
 ## How to use this file
 
-This is the full-product backlog, not the hackathon sprint board. Preserve its broad scope for post-hackathon development. Update the checkboxes as work progresses and commit changes regularly. During the hackathon, work only from the companion `AegisMCP_Hackathon_MVP_Tracker.md`; do not try to complete this entire backlog in the event.
+This is the full-product backlog, not the hackathon sprint board. Preserve its broad scope for post-hackathon development. Update the checkboxes as work progresses and commit changes regularly. During the hackathon, work only from the companion `Trust_Gate_Hackathon_MVP_Tracker.md`; do not try to complete this entire backlog in the event.
 
 ### Status legend
 
@@ -37,7 +37,7 @@ Copy this template for new work items:
 
 - [ ] Every protected MCP tool invocation passes through one centralized security execution pipeline.
 - [ ] Every tool response is inspected before it is returned to the AI host.
-- [ ] No protected integration is connected directly to the AI host in a way that bypasses AegisMCP.
+- [ ] No protected integration is connected directly to the AI host in a way that bypasses Trust Gate.
 - [ ] The policy engine, not the LLM, makes the final authorization decision.
 - [ ] Every model-facing tool response is inspected before forwarding; if mandatory response inspection is unavailable, withhold the response content and return only a sanitized error.
 - [ ] Sensitive reads and writes fail closed when their mandatory security controls are unavailable.
@@ -55,12 +55,12 @@ Copy this template for new work items:
 
 ## 1.1 Product definition
 
-**AegisMCP** is an MCP-aware broker with two interfaces:
+**Trust Gate** is an MCP-aware broker with two interfaces:
 
 - **Northbound:** Exposes a protected MCP interface to AI applications and MCP-compatible hosts.
 - **Southbound:** Maintains individual MCP client connections to approved upstream MCP servers.
 
-AegisMCP understands MCP tool discovery, schemas, invocation, and responses. It is not intended to be only a generic HTTP proxy that inspects raw JSON-RPC traffic.
+Trust Gate understands MCP tool discovery, schemas, invocation, and responses. It is not intended to be only a generic HTTP proxy that inspects raw JSON-RPC traffic.
 
 ### Core security principle
 
@@ -79,7 +79,7 @@ AI agents can access connected services and perform operations on a user's behal
 
 ## 1.3 Product outcome
 
-AegisMCP should provide:
+Trust Gate should provide:
 
 - Centralized MCP tool routing.
 - Tool and parameter inspection.
@@ -95,7 +95,7 @@ AegisMCP should provide:
 ### Must-have for the hackathon MVP
 
 - [ ] Authenticated northbound MCP endpoint and principal derived from verified auth context.
-- [ ] Working downstream Aegis MCP server and upstream MCP clients.
+- [ ] Working downstream Trust Gate server and upstream MCP clients.
 - [ ] At least two controlled mock upstream integrations, initially Gmail and Drive.
 - [ ] Approved tool discovery, namespaced registry and routing.
 - [ ] Centralized policy evaluation with `ALLOW`, `REQUIRE_APPROVAL`, and `BLOCK` outcomes.
@@ -129,8 +129,8 @@ AegisMCP should provide:
 
 ## 1.5 Operating modes
 
-- [ ] **Gateway mode (primary):** External AI application connects to AegisMCP as its MCP server; AegisMCP connects to approved upstream servers.
-- [ ] **Managed-host mode (future):** AegisMCP provides its own AI interface and manages all MCP clients.
+- [ ] **Gateway mode (primary):** External AI application connects to Trust Gate as its MCP server; Trust Gate connects to approved upstream servers.
+- [ ] **Managed-host mode (future):** Trust Gate provides its own AI interface and manages all MCP clients.
 
 **Scope decision:** Build gateway mode first. Managed-host mode is not required for the first MVP.
 
@@ -152,7 +152,7 @@ AegisMCP should provide:
                            |
                            v
 +------------------------------------------------------------------+
-|                         AEGISMCP GATEWAY                         |
+|                         TRUST GATE SECURITY GATEWAY                         |
 |                                                                  |
 |  Authenticated principal + trusted execution workspace           |
 |                           |                                      |
@@ -203,7 +203,7 @@ AegisMCP should provide:
        invocations / policies / approvals / audit / findings
 ```
 
-**Deployment constraint:** Every protected integration must be routed through AegisMCP. An MCP server connected separately and directly to the AI host can bypass the gateway. AegisMCP cannot claim to protect connections it does not control.
+**Deployment constraint:** Every protected integration must be routed through Trust Gate. An MCP server connected separately and directly to the AI host can bypass the gateway. Trust Gate cannot claim to protect connections it does not control.
 
 ## 2.2 Authentication and northbound identity
 
@@ -242,7 +242,7 @@ Use two names for each dynamically discovered tool, and never confuse them:
 |---|---|---|
 | `server_id` | `gmail-prod` | Stable upstream server identity |
 | `upstream_tool_name` | `send_email` | Exact name advertised by the upstream server |
-| `exposed_tool_name` | `gmail_send_email` | Namespaced name presented by AegisMCP to the AI host |
+| `exposed_tool_name` | `gmail_send_email` | Namespaced name presented by Trust Gate to the AI host |
 
 The canonical policy and registry key is `(server_id, upstream_tool_name)`. The namespaced `exposed_tool_name` is the public tool identifier at the northbound boundary. Persist both, and include both in audit events.
 
@@ -256,7 +256,7 @@ Approval lifecycle status and execution status are separate state machines; they
 
 ## 2.4 Data lineage and outbound taint tracking
 
-Response-only DLP is insufficient. AegisMCP must remember which retrieved artifacts were classified as sensitive so it can evaluate later outbound operations that reference those artifacts.
+Response-only DLP is insufficient. Trust Gate must remember which retrieved artifacts were classified as sensitive so it can evaluate later outbound operations that reference those artifacts.
 
 ### Artifact and taint model
 
@@ -273,11 +273,11 @@ Response-only DLP is insufficient. AegisMCP must remember which retrieved artifa
 
 ### Outbound example
 
-1. The AI reads `drive_file_001` through AegisMCP.
+1. The AI reads `drive_file_001` through Trust Gate.
 2. Response DLP classifies the document as `CONFIDENTIAL` and stores its stable artifact identity and content hash.
-3. AegisMCP records that `drive_file_001` is tainted in the demo principal's trusted workspace.
+3. Trust Gate records that `drive_file_001` is tainted in the demo principal's trusted workspace.
 4. A later `gmail_send_email` invocation references `drive_file_001` in `attachment_ids`.
-5. Aegis resolves the ID, retrieves the classification/taint record, checks the recipient and evaluates policy.
+5. Trust Gate resolves the ID, retrieves the classification/taint record, checks the recipient and evaluates policy.
 6. External transmission of the confidential artifact returns `REQUIRE_APPROVAL` before Gmail is called.
 
 If an agent tries to send an artifact it has not previously read, the gateway must still resolve and inspect it through trusted upstream metadata/content where possible. If it cannot establish the artifact's classification, it must not assume the artifact is safe.
@@ -399,7 +399,7 @@ The SDK and MCP specification evolve. Do not copy API names or protocol assumpti
 ## 4.1 Proposed repository structure
 
 ```text
-aegismcp/
+trust-gate/
 ├── frontend/
 │   ├── src/
 │   ├── components/
@@ -445,7 +445,7 @@ aegismcp/
 ├── pyproject.toml
 ├── .env.example
 ├── README.md
-└── AegisMCP_Complete_Development_Roadmap.md
+└── Trust_Gate_Complete_Development_Roadmap.md
 ```
 
 ## 4.2 Foundation checklist
@@ -638,9 +638,9 @@ Checklist:
 
 # 7. Build the MCP Gateway
 
-**Priority: First major runtime subsystem.** The initial milestone is a working MCP client/server path through AegisMCP, with authentication and audit hooks present from the start.
+**Priority: First major runtime subsystem.** The initial milestone is a working MCP client/server path through Trust Gate, with authentication and audit hooks present from the start.
 
-## 7.1 Downstream Aegis MCP server
+## 7.1 Downstream Trust Gate server
 
 - [ ] Prototype the official Python SDK's low-level `Server` API for dynamic tools and centralized dispatch.
 - [ ] Implement `on_list_tools` from the approved dynamic tool registry.
@@ -682,17 +682,17 @@ Checklist:
 ## 7.4 First end-to-end gateway milestone
 
 - [ ] Authenticate the test client and derive the principal from verified transport context.
-- [ ] Connect an MCP-compatible test host/client to AegisMCP.
+- [ ] Connect an MCP-compatible test host/client to Trust Gate.
 - [ ] Confirm the host discovers one approved namespaced Gmail search tool.
-- [ ] Invoke the tool through AegisMCP.
-- [ ] Confirm AegisMCP calls the mock Gmail MCP server.
+- [ ] Invoke the tool through Trust Gate.
+- [ ] Confirm Trust Gate calls the mock Gmail MCP server.
 - [ ] Confirm the result returns only after response inspection.
 - [ ] Record an invocation ID and sanitized audit event.
 - [ ] Verify the protected host configuration does not also connect directly to the upstream mock server.
 
 ### Gateway quality gate
 
-- [ ] A test MCP host connects to the authenticated AegisMCP endpoint.
+- [ ] A test MCP host connects to the authenticated Trust Gate endpoint.
 - [ ] At least two mock upstream servers can be registered and distinguished.
 - [ ] Dynamic tool discovery returns only approved namespaced tools.
 - [ ] Every tool call reaches the central execution service.
@@ -853,7 +853,7 @@ Illustrative rules only: production policy must bind to the authenticated princi
 
 ## 10.1 Two-direction data-protection pipeline
 
-**Inbound response: upstream MCP server → AegisMCP → AI host**
+**Inbound response: upstream MCP server → Trust Gate → AI host**
 
 ```text
 Raw tool response
@@ -874,7 +874,7 @@ Artifact identity + provenance + taint registration
 Sanitized model-facing response
 ```
 
-**Outbound operation: AI host → AegisMCP → upstream MCP server**
+**Outbound operation: AI host → Trust Gate → upstream MCP server**
 
 ```text
 Tool arguments / attachment references
@@ -1017,7 +1017,7 @@ A clean description scan is not proof of safety. Initial review, least privilege
 - [ ] Compare the current definition with the last human-approved definition.
 - [ ] Generate a before/after diff.
 - [ ] Quarantine changed/new tools pending review.
-- [ ] Notify downstream clients of Aegis's exposed tool-list changes where the selected protocol/transport supports the relevant notification/subscription mechanism.
+- [ ] Notify downstream clients of Trust Gate's exposed tool-list changes where the selected protocol/transport supports the relevant notification/subscription mechanism.
 - [ ] Test notification support against the actual target client; do not assume all MCP clients refresh tool lists identically.
 
 ## 11.4 Anomaly detection — post-MVP
@@ -1108,7 +1108,7 @@ Authenticated user reviews the exact operation
 - [ ] Execute only the frozen stored payload, not mutable arguments from a later AI request.
 - [ ] Reject expired, altered, replayed, cross-user or already-consumed approvals.
 - [ ] Keep approval UI separate from model-callable MCP tools.
-- [ ] Do not provide `aegis_approve_anything` or other model-callable approval bypasses.
+- [ ] Do not provide `trust_gate_approve_anything` or other model-callable approval bypasses.
 - [ ] Record decision and execution outcome separately.
 
 ## 12.4 Reliability and idempotency
@@ -1193,11 +1193,11 @@ Authenticated user reviews the exact operation
 
 - [ ] Integrate an OAuth 2.1-compatible authorization server or identity provider.
 - [ ] Implement the MCP resource-server token verifier supported by the pinned SDK.
-- [ ] Validate issuer, signature/introspection, expiry, scopes and audience/resource for AegisMCP.
+- [ ] Validate issuer, signature/introspection, expiry, scopes and audience/resource for Trust Gate.
 - [ ] Obtain authenticated subject/client/scopes from trusted SDK request context.
 - [ ] Enforce tenant and user ownership in all REST and MCP paths.
 - [ ] Implement token revocation, key rotation and identity-provider outage behavior.
-- [ ] Do not forward a northbound Aegis access token to an upstream server; obtain and use server-specific upstream credentials.
+- [ ] Do not forward a northbound Trust Gate access token to an upstream server; obtain and use server-specific upstream credentials.
 
 ## 14.3 Upstream credential service
 
@@ -1334,7 +1334,7 @@ Start with mock integrations. Add real integrations only after the complete secu
 - [ ] Select the minimum Gmail scopes required.
 - [ ] Implement OAuth authorization and callback.
 - [ ] Encrypt and store credentials.
-- [ ] Connect Aegis upstream client to Gmail MCP.
+- [ ] Connect Trust Gate upstream client to Gmail MCP.
 - [ ] Discover and register Gmail tools.
 - [ ] Allow approved read/search operations.
 - [ ] Route email sending through policy and approval controls.
@@ -1349,7 +1349,7 @@ Start with mock integrations. Add real integrations only after the complete secu
 - [ ] Configure Google Cloud and OAuth scopes.
 - [ ] Implement authorization and token handling.
 - [ ] Encrypt and store credentials.
-- [ ] Connect Aegis upstream client to Drive MCP.
+- [ ] Connect Trust Gate upstream client to Drive MCP.
 - [ ] Discover and register Drive tools.
 - [ ] Allow approved search/read operations.
 - [ ] Inspect document contents through DLP before returning to AI.
@@ -1361,7 +1361,7 @@ Start with mock integrations. Add real integrations only after the complete secu
 
 - [ ] Select and review Calendar MCP connector.
 - [ ] Configure minimum OAuth scopes.
-- [ ] Connect through Aegis upstream client manager.
+- [ ] Connect through Trust Gate upstream client manager.
 - [ ] Register and fingerprint Calendar tools.
 - [ ] Implement read-only event retrieval first.
 - [ ] Add controlled event creation/modification only after policy coverage.
@@ -1369,7 +1369,7 @@ Start with mock integrations. Add real integrations only after the complete secu
 
 ## 16.4 Integration rule
 
-- [ ] All real integrations are connected to the AI host only through AegisMCP for the protected workflow.
+- [ ] All real integrations are connected to the AI host only through Trust Gate for the protected workflow.
 - [ ] Tokens are isolated per service.
 - [ ] The AI model never receives raw provider credentials.
 - [ ] Tool results are inspected before reaching the model.
@@ -1395,15 +1395,15 @@ Start with mock integrations. Add real integrations only after the complete secu
 | `/api/threats` | GET | Retrieve threat events | [ ] | [ ] | [ ] |
 | `/api/audit` | GET | Retrieve audit history | [ ] | [ ] | [ ] |
 
-## 17.2 Aegis administrative MCP tools
+## 17.2 Trust Gate administrative MCP tools
 
-- [ ] `aegis_list_servers`
-- [ ] `aegis_security_status`
-- [ ] `aegis_get_approval_status`
-- [ ] `aegis_get_security_report`
-- [ ] `aegis_request_tool_access`
+- [ ] `trust_gate_list_servers`
+- [ ] `trust_gate_security_status`
+- [ ] `trust_gate_get_approval_status`
+- [ ] `trust_gate_get_security_report`
+- [ ] `trust_gate_request_tool_access`
 
-Do not expose unrestricted model-callable tools such as `aegis_disable_security` or `aegis_approve_anything`. Human approval belongs in a separately authenticated user interface.
+Do not expose unrestricted model-callable tools such as `trust_gate_disable_security` or `trust_gate_approve_anything`. Human approval belongs in a separately authenticated user interface.
 
 ---
 
@@ -1485,8 +1485,8 @@ Testing is a first-class workstream. Each feature should have unit tests, integr
 
 ### Integration tests
 
-- [ ] Aegis downstream server to upstream mock Gmail server.
-- [ ] Aegis downstream server to upstream mock Drive server.
+- [ ] Trust Gate downstream server to upstream mock Gmail server.
+- [ ] Trust Gate downstream server to upstream mock Drive server.
 - [ ] Tool discovery and namespacing.
 - [ ] Policy decision to upstream execution.
 - [ ] DLP response filtering.
@@ -1512,7 +1512,7 @@ Testing is a first-class workstream. Each feature should have unit tests, integr
 
 ### End-to-end tests
 
-- [ ] Normal email search from host through Aegis to mock Gmail.
+- [ ] Normal email search from host through Trust Gate to mock Gmail.
 - [ ] Sensitive document retrieval and sanitization.
 - [ ] Prompt-injection fixture produces a threat event.
 - [ ] External sensitive email is paused for approval.
@@ -1527,7 +1527,7 @@ Use this same matrix in the full product roadmap and the companion MVP tracker. 
 | ID | Scenario | Expected result | Implemented | Tested/pass | Audited | Evidence / notes |
 |---|---|---|---|---|---|---|
 | T01 | Missing, invalid or expired northbound token | Request rejected before tool handler execution | [ ] | [ ] | [ ] | |
-| T02 | Normal permitted Gmail search | Allowed and routed through Aegis | [ ] | [ ] | [ ] | |
+| T02 | Normal permitted Gmail search | Allowed and routed through Trust Gate | [ ] | [ ] | [ ] | |
 | T03 | Unpermitted tool/operation | Blocked; upstream invocation counter unchanged | [ ] | [ ] | [ ] | |
 | T04 | Sensitive document returned by Drive | Required fields redacted before model-facing response | [ ] | [ ] | [ ] | |
 | T05 | Response inspector/DLP unavailable during read | Raw response withheld; sanitized error returned | [ ] | [ ] | [ ] | |
@@ -1545,7 +1545,7 @@ Use this same matrix in the full product roadmap and the companion MVP tracker. 
 | T17 | Policy engine unavailable | Protected operation fails closed | [ ] | [ ] | [ ] | |
 | T18 | DLP/response inspection unavailable | Model-facing response content withheld; outbound protected write blocked | [ ] | [ ] | [ ] | |
 | T19 | Malicious instructions in retrieved email | Flagged/untrusted; cannot modify policy or authorize follow-on call | [ ] | [ ] | [ ] | |
-| T20 | Protected host also connects directly to upstream | Deployment/configuration audit confirms protected integrations are connected only through Aegis; any direct connection is outside the protection claim | [ ] | [ ] | [ ] | |
+| T20 | Protected host also connects directly to upstream | Deployment/configuration audit confirms protected integrations are connected only through Trust Gate; any direct connection is outside the protection claim | [ ] | [ ] | [ ] | |
 
 ## 19.3 Test evidence requirements
 
@@ -1623,7 +1623,7 @@ Create the correlation ID and minimal audit event interface in the foundation/ga
 
 # 22. Hackathon Demonstration Plan
 
-The central demonstration should show a malicious email attempting to manipulate an AI agent into sharing a confidential document. AegisMCP should inspect the content, protect sensitive information, stop the unauthorized transmission, require human approval for a permitted high-risk action, and record the result.
+The central demonstration should show a malicious email attempting to manipulate an AI agent into sharing a confidential document. Trust Gate should inspect the content, protect sensitive information, stop the unauthorized transmission, require human approval for a permitted high-risk action, and record the result.
 
 ## 22.1 Demo environment preparation
 
@@ -1634,8 +1634,8 @@ The central demonstration should show a malicious email attempting to manipulate
 - [ ] Include one malicious prompt-injection email fixture.
 - [ ] Configure the Gmail mock server's send counter.
 - [ ] Configure the Drive mock server's write/share counter if applicable.
-- [ ] Connect the demo MCP client/AI host to AegisMCP only.
-- [ ] Confirm all protected calls pass through Aegis.
+- [ ] Connect the demo MCP client/AI host to Trust Gate only.
+- [ ] Confirm all protected calls pass through Trust Gate.
 - [ ] Start dashboard and live event stream.
 - [ ] Reset demo database and mock-server state before the presentation.
 - [ ] Prepare a repeatable scripted demo client as a fallback to unpredictable LLM behavior.
@@ -1647,8 +1647,8 @@ The central demonstration should show a malicious email attempting to manipulate
 
 Prompt: “Find my latest train ticket confirmation in Gmail.”
 
-- [ ] AI host invokes Gmail search through Aegis.
-- [ ] Aegis records the invocation.
+- [ ] AI host invokes Gmail search through Trust Gate.
+- [ ] Trust Gate records the invocation.
 - [ ] Policy returns `ALLOW`.
 - [ ] Mock Gmail executes the search.
 - [ ] Response inspection completes.
@@ -1664,8 +1664,8 @@ Prompt: “Read my financial statement and summarize my expenses.”
 - [ ] Policy-required fields are redacted.
 - [ ] Task-relevant values are retained where permitted.
 - [ ] AI host receives sanitized content only.
-- [ ] Aegis stores the artifact identity, owner, source, classification and content hash where available.
-- [ ] Aegis records the artifact as tainted in the trusted principal/workspace context.
+- [ ] Trust Gate stores the artifact identity, owner, source, classification and content hash where available.
+- [ ] Trust Gate records the artifact as tainted in the trusted principal/workspace context.
 - [ ] Dashboard displays redaction and artifact-classification evidence without exposing original values.
 
 ### Demo 3 — Prompt injection inspection
@@ -1680,8 +1680,8 @@ Prompt: “Read my financial statement and summarize my expenses.”
 
 Attempt: Send the previously retrieved confidential artifact to an unapproved external recipient using its stable artifact ID.
 
-- [ ] Aegis intercepts the `gmail_send_email` invocation.
-- [ ] Aegis resolves the attachment ID and its stored classification/taint.
+- [ ] Trust Gate intercepts the `gmail_send_email` invocation.
+- [ ] Trust Gate resolves the attachment ID and its stored classification/taint.
 - [ ] Policy returns `REQUIRE_APPROVAL` before upstream execution.
 - [ ] Upstream send counter remains zero before the human decision.
 - [ ] Approval request displays exact recipient, attachment identity, classification and risk reason.
@@ -1693,7 +1693,7 @@ Attempt: Send the previously retrieved confidential artifact to an unapproved ex
 ### Demo 5 — Legitimate approved transmission
 
 - [ ] Start a second controlled send to a designated test recipient.
-- [ ] Aegis creates an approval request.
+- [ ] Trust Gate creates an approval request.
 - [ ] User reviews exact recipient, content, and attachment.
 - [ ] User approves the exact operation.
 - [ ] Backend validates the operation fingerprint and consumes approval once.
@@ -1704,7 +1704,7 @@ Attempt: Send the previously retrieved confidential artifact to an unapproved ex
 
 | Property | Evidence to show | Done |
 |---|---|---|
-| Gateway interception | Invocation visible in Aegis with request/correlation ID | [ ] |
+| Gateway interception | Invocation visible in Trust Gate with request/correlation ID | [ ] |
 | Effective blocking | Upstream execution counter stays at zero for blocked/rejected call | [ ] |
 | DLP enforcement | Sensitive values are absent from model-facing response | [ ] |
 | Approval integrity | Frozen and approved operation fingerprints match | [ ] |
@@ -1718,7 +1718,7 @@ Attempt: Send the previously retrieved confidential artifact to an unapproved ex
 - [ ] Confirm the demo works without public internet where practical.
 - [ ] Prepare a local fallback if the AI host or external integration fails.
 - [ ] Prepare a scripted MCP test client to guarantee the exact tool-call sequence.
-- [ ] Ensure the scripted client still uses the real running Aegis gateway.
+- [ ] Ensure the scripted client still uses the real running Trust Gate gateway.
 - [ ] Do not fake policy decisions or dashboard metrics.
 - [ ] Label any simulated upstream service or synthetic data clearly.
 
@@ -1730,10 +1730,10 @@ Attempt: Send the previously retrieved confidential artifact to an unapproved ex
 
 | Slide | Topic | Key message | Done |
 |---|---|---|---|
-| 1 | Project title | AegisMCP — Security Infrastructure for AI Agents | [ ] |
+| 1 | Project title | Trust Gate — Security Infrastructure for AI Agents | [ ] |
 | 2 | Problem | AI agents can access tools and perform consequential operations | [ ] |
 | 3 | Security gap | Tool connectivity needs independent execution control | [ ] |
-| 4 | Solution | AegisMCP sits between AI hosts and upstream MCP servers | [ ] |
+| 4 | Solution | Trust Gate sits between AI hosts and upstream MCP servers | [ ] |
 | 5 | Architecture | Gateway, threat inspection, DLP, policy, approval, audit | [ ] |
 | 6 | Live demo | Show attack, interception, and approval | [ ] |
 | 7 | Technical implementation | MCP SDK, FastAPI, Presidio, PostgreSQL, React | [ ] |
@@ -1741,11 +1741,11 @@ Attempt: Send the previously retrieved confidential artifact to an unapproved ex
 
 ## 23.2 Core opening message
 
-> AI agents are becoming increasingly capable of interacting with external systems. They can access emails, retrieve documents, manage calendars, and execute actions on behalf of users. But what happens when an AI agent is manipulated by a malicious email into exposing confidential information? AegisMCP introduces an independent security enforcement layer between AI applications and the tools they use.
+> AI agents are becoming increasingly capable of interacting with external systems. They can access emails, retrieve documents, manage calendars, and execute actions on behalf of users. But what happens when an AI agent is manipulated by a malicious email into exposing confidential information? Trust Gate introduces an independent security enforcement layer between AI applications and the tools they use.
 
 ## 23.3 Core closing message
 
-> AI agents should not automatically be trusted with the authority to execute every operation they can access. Every protected tool invocation should be inspected, evaluated, and authorized before execution. AegisMCP is designed to keep consequential actions under independent security controls and human oversight.
+> AI agents should not automatically be trusted with the authority to execute every operation they can access. Every protected tool invocation should be inspected, evaluated, and authorized before execution. Trust Gate is designed to keep consequential actions under independent security controls and human oversight.
 
 ## 23.4 Presentation readiness
 
@@ -1840,9 +1840,9 @@ Do not call the MVP complete until the relevant criteria are satisfied and evide
 
 ## MCP gateway and identity
 
-- [ ] An authenticated MCP client successfully connects to AegisMCP.
+- [ ] An authenticated MCP client successfully connects to Trust Gate.
 - [ ] The principal is derived from verified transport authentication, not tool arguments.
-- [ ] AegisMCP connects to multiple upstream mock MCP servers.
+- [ ] Trust Gate connects to multiple upstream mock MCP servers.
 - [ ] Upstream tools are discovered and namespaced consistently.
 - [ ] Protected tools are routed through the centralized execution service.
 
@@ -1884,7 +1884,7 @@ Review this register throughout development. Add new risks when discovered.
 
 | Risk | Impact | Mitigation / response | Reviewed |
 |---|---|---|---|
-| AI host connects directly to upstream and bypasses Aegis | Gateway protection is incomplete | Configure protected integrations only through Aegis; document that Aegis cannot enforce connections outside its execution path | [ ] |
+| AI host connects directly to upstream and bypasses Trust Gate | Gateway protection is incomplete | Configure protected integrations only through Trust Gate; document that Trust Gate cannot enforce connections outside its execution path | [ ] |
 | Prompt injection is not detected | Malicious instructions may reach the model | Treat all external content as untrusted; independently enforce every tool call | [ ] |
 | PII detector misses a sensitive value | Data exposure | Add custom recognizers, validation, tests, and conservative policies | [ ] |
 | False-positive DLP detections | Useful content may be removed | Use entity confidence, task-aware policy, and test fixtures | [ ] |
@@ -1894,14 +1894,14 @@ Review this register throughout development. Add new risks when discovered.
 | Security service unavailable | Unsafe operation may proceed or uninspected data may reach the model | Withhold uninspected responses; fail closed on protected writes and required checks | [ ] |
 | Credential leakage | Account compromise | Encryption, least privilege, redaction, per-server isolation | [ ] |
 | MCP client compatibility mismatch | Demo/integration failure | Pin SDK/protocol and test exact target client | [ ] |
-| Live demo LLM behaves unpredictably | Demo flow may fail | Use a scripted MCP test client against the real Aegis gateway as fallback | [ ] |
+| Live demo LLM behaves unpredictably | Demo flow may fail | Use a scripted MCP test client against the real Trust Gate gateway as fallback | [ ] |
 
 ## 26.1 Claims that must not be made
 
 - [ ] Do not claim prompt injection can always be detected.
 - [ ] Do not claim PII detection is 100% accurate.
 - [ ] Do not claim schema fingerprinting detects hidden implementation changes.
-- [ ] Do not claim Aegis protects direct connections that bypass the gateway.
+- [ ] Do not claim Trust Gate protects direct connections that bypass the gateway.
 - [ ] Do not claim exactly-once execution for third-party services unless the connector/service provides a verifiable mechanism.
 - [ ] Do not describe mock integrations as real production integrations.
 - [ ] Do not present simulated metrics as measured system results.
@@ -1910,14 +1910,14 @@ Review this register throughout development. Add new risks when discovered.
 
 # 27. Recommended Full-Product Build Order and Phase Gates
 
-This is the dependency order for the complete product. The companion `AegisMCP_Hackathon_MVP_Tracker.md` is the shorter time-boxed route for the event. Audit hooks and identity are foundational and must not be postponed until their full UI/services are complete.
+This is the dependency order for the complete product. The companion `Trust_Gate_Hackathon_MVP_Tracker.md` is the shorter time-boxed route for the event. Audit hooks and identity are foundational and must not be postponed until their full UI/services are complete.
 
 | Order | Phase | Exit condition | Implemented | Tested | Audited |
 |---:|---|---|---|---|---|
 | 1 | Scope, threat model, ADRs and repository | Architecture decisions and local setup are recorded | [ ] | [ ] | [ ] |
 | 2 | Identity boundary and audit event interface | Verified principal is available to tool handlers; early events persist | [ ] | [ ] | [ ] |
 | 3 | Database and mock MCP servers | Migrations, controlled fixtures and counters work | [ ] | [ ] | [ ] |
-| 4 | MCP gateway and dynamic tool registry | Client invokes approved upstream tool through Aegis | [ ] | [ ] | [ ] |
+| 4 | MCP gateway and dynamic tool registry | Client invokes approved upstream tool through Trust Gate | [ ] | [ ] | [ ] |
 | 5 | Initial tool review and schema integrity | New/changed tools are reviewed or quarantined | [ ] | [ ] | [ ] |
 | 6 | Deterministic policy enforcement | Allow/block/approval decisions prevent unauthorized calls | [ ] | [ ] | [ ] |
 | 7 | DLP, artifact registry and taint tracking | Responses are sanitized and outbound operations resolve source data | [ ] | [ ] | [ ] |
@@ -2008,7 +2008,7 @@ For every significant decision, record:
 - Human Approval.
 - Audit System.
 
-**Primary differentiator:** AegisMCP does not simply warn users about potentially dangerous AI actions. It sits directly in the execution path and enforces whether those actions are permitted.
+**Primary differentiator:** Trust Gate does not simply warn users about potentially dangerous AI actions. It sits directly in the execution path and enforces whether those actions are permitted.
 
 ---
 
@@ -2035,9 +2035,9 @@ Keep these references available during implementation and verify version-specifi
 
 ## Companion hackathon tracker
 
-Use `AegisMCP_Hackathon_MVP_Tracker.md` for the 72-hour, four-workstream vertical slice. It contains the MVP acceptance gates, required test subset, owners, evidence log and live-demo runbook. The full-product backlog above is intentionally broader and should not be treated as a hackathon completion target.
+Use `Trust_Gate_Hackathon_MVP_Tracker.md` for the 72-hour, four-workstream vertical slice. It contains the MVP acceptance gates, required test subset, owners, evidence log and live-demo runbook. The full-product backlog above is intentionally broader and should not be treated as a hackathon completion target.
 
 ## Final implementation instruction
 
-**The very first technical milestone is the MCP gateway and policy enforcement path — not the frontend, not the AI chatbot, and not the advanced threat dashboard.** First prove that an MCP client can connect to AegisMCP, discover a tool, invoke it through an upstream MCP server, and have AegisMCP enforce a security decision before execution. Build every other capability around that foundation.
+**The very first technical milestone is the MCP gateway and policy enforcement path — not the frontend, not the AI chatbot, and not the advanced threat dashboard.** First prove that an MCP client can connect to Trust Gate, discover a tool, invoke it through an upstream MCP server, and have Trust Gate enforce a security decision before execution. Build every other capability around that foundation.
 

@@ -1,8 +1,8 @@
-# AegisMCP — Hackathon MVP Tracker
+# Trust Gate — Hackathon MVP Tracker
 
-> **Purpose:** A focused, checkbox-driven execution plan for delivering a working AegisMCP vertical slice. This file is intentionally much smaller than `AegisMCP_Full_Product_Roadmap.md`.
+> **Purpose:** A focused, checkbox-driven execution plan for delivering a working Trust Gate vertical slice. This file is intentionally much smaller than `Trust_Gate_Full_Product_Roadmap.md`.
 >
-> **MVP proof:** An authenticated MCP client calls tools through AegisMCP; Aegis sanitizes a sensitive document, remembers its classification/provenance, intercepts an attempted external send, requires approval for the exact operation, and proves that rejected operations never reach the upstream server.
+> **MVP proof:** An authenticated MCP client calls tools through Trust Gate; Trust Gate sanitizes a sensitive document, remembers its classification/provenance, intercepts an attempted external send, requires approval for the exact operation, and proves that rejected operations never reach the upstream server.
 
 ---
 
@@ -52,7 +52,7 @@ This plan uses an **illustrative 72-hour hackathon** and **four workstreams** be
 - [ ] Full SIEM integration or a complete enterprise administration dashboard.
 - [ ] Claims of perfect prompt-injection or PII detection.
 
-Use synthetic data only. The real product roadmap remains in `AegisMCP_Full_Product_Roadmap.md`.
+Use synthetic data only. The real product roadmap remains in `Trust_Gate_Full_Product_Roadmap.md`.
 
 ---
 
@@ -62,22 +62,22 @@ Use synthetic data only. The real product roadmap remains in `AegisMCP_Full_Prod
 
 The demo follows one end-to-end story:
 
-1. A user/client authenticates to AegisMCP.
-2. The AI client discovers and invokes approved namespaced Gmail/Drive tools through Aegis.
+1. A user/client authenticates to Trust Gate.
+2. The AI client discovers and invokes approved namespaced Gmail/Drive tools through Trust Gate.
 3. A document is retrieved from the mock Drive server.
 4. DLP redacts sensitive identifiers before the result reaches the AI and records the document as `CONFIDENTIAL` with a stable artifact ID.
 5. A malicious email is retrieved and marked as untrusted.
 6. The AI/demo client attempts to send the confidential artifact to an external recipient by stable artifact ID.
-7. Aegis resolves the artifact's classification/taint and returns `REQUIRE_APPROVAL` without calling the mock Gmail send tool.
+7. Trust Gate resolves the artifact's classification/taint and returns `REQUIRE_APPROVAL` without calling the mock Gmail send tool.
 8. The user rejects the request; the upstream send counter stays at zero.
-9. A separate legitimate test request is approved; Aegis executes the exact frozen payload once.
+9. A separate legitimate test request is approved; Trust Gate executes the exact frozen payload once.
 10. The audit/activity view shows the full chain of decisions and outcomes.
 
 ## 1.2 Mandatory MVP acceptance criteria
 
 - [ ] A client authenticates before using the protected MCP endpoint.
 - [ ] The principal is derived from verified auth context; no tool argument can choose `user_id`.
-- [ ] At least one approved tool from each mock upstream server is discoverable through Aegis.
+- [ ] At least one approved tool from each mock upstream server is discoverable through Trust Gate.
 - [ ] Every tool invocation passes through one central execution service.
 - [ ] A blocked call never reaches the upstream mock server (verified by a counter).
 - [ ] Every model-facing response is inspected; if inspection fails, raw result content is withheld.
@@ -116,7 +116,7 @@ Scripted MCP demo client / optional AI host
 Northbound auth middleware / token verifier
           |
           v
-Aegis low-level MCP Server
+Trust Gate low-level MCP Server
   on_list_tools -> approved dynamic registry
   on_call_tool  -> central execution service
           |
@@ -176,9 +176,9 @@ This is a demo-only token arrangement, not production OAuth. The full product ro
 ## 2.4 Outbound artifact resolution rule
 
 - [ ] Mock Drive returns a stable `artifact_id`/`file_id`, classification-relevant content and content hash.
-- [ ] Aegis stores artifact ownership, source server/tool, classification, workspace and content hash.
+- [ ] Trust Gate stores artifact ownership, source server/tool, classification, workspace and content hash.
 - [ ] Mock Gmail `send_email` accepts `attachment_ids`, not only a display filename.
-- [ ] Before a send, Aegis resolves every attachment ID against the artifact registry and verifies owner/workspace.
+- [ ] Before a send, Trust Gate resolves every attachment ID against the artifact registry and verifies owner/workspace.
 - [ ] A filename alone is not evidence of identity or classification.
 - [ ] Unknown/unresolvable attachments are not silently considered `PUBLIC`; block or require review by explicit policy.
 - [ ] For any later production connector, re-resolve/re-hash attachment content immediately before delayed execution where supported.
@@ -202,7 +202,7 @@ The suggested schedule assumes four people working in parallel. Reassign owners 
 | Timebox | Work package | Primary owner | Exit condition |
 |---|---|---|---|
 | T+0–4h | Scope lock, repo, contracts, environment, DB and audit skeleton | All / A | App starts, migrations run, event interface exists |
-| T+4–14h | Authenticated MCP gateway and mock servers | A + D | Authenticated client invokes mock read through Aegis |
+| T+4–14h | Authenticated MCP gateway and mock servers | A + D | Authenticated client invokes mock read through Trust Gate |
 | T+14–22h | Tool registry, central execution service and policy engine | A + B | Allow/block/approval decisions enforced; counter proves block |
 | T+22–32h | Presidio response DLP, artifact registry and taint | B + D | Confidential Drive result is sanitized and tainted |
 | T+32–42h | Approval persistence, exact-operation verification and minimal UI | A + B + C | Rejected send never executes; exact approved send executes once |
@@ -269,7 +269,7 @@ If the event is shorter than 72 hours, remove optional UI polish and schema-chan
 - [ ] Ensure tool schemas do not contain an authoritative `user_id` input.
 - [ ] Protect the minimal approval API with the same principal check.
 
-**Exit gate:** The scripted MCP client cannot call Aegis without the valid demo token; with the token it can connect and reach a mock server.
+**Exit gate:** The scripted MCP client cannot call Trust Gate without the valid demo token; with the token it can connect and reach a mock server.
 
 - [ ] Implemented
 - [ ] Tested
@@ -294,7 +294,7 @@ If the event is shorter than 72 hours, remove optional UI polish and schema-chan
 - [ ] Emit request, decision and execution audit events.
 - [ ] Add timeout and safe upstream error handling.
 
-**Exit gate:** Normal read executes through Aegis; blocked operation is rejected before upstream and its upstream counter remains unchanged.
+**Exit gate:** Normal read executes through Trust Gate; blocked operation is rejected before upstream and its upstream counter remains unchanged.
 
 - [ ] Implemented
 - [ ] Tested
@@ -429,7 +429,7 @@ If the event is shorter than 72 hours, remove optional UI polish and schema-chan
 
 **Goal:** A deterministic presentation that uses the actual running gateway and mock servers.
 
-- [ ] Create a scripted MCP client that connects to Aegis using the demo bearer token.
+- [ ] Create a scripted MCP client that connects to Trust Gate using the demo bearer token.
 - [ ] Do not rely on LLM behavior for the core attack path; optionally add an LLM interface as a secondary layer.
 - [ ] Implement named scenarios: `NORMAL_SEARCH`, `READ_CONFIDENTIAL_FILE`, `PROMPT_INJECTION_EMAIL`, `REJECT_EXTERNAL_SEND`, `APPROVE_LEGITIMATE_SEND`, `DLP_FAILURE`.
 - [ ] Verify the prompt-injection fixture is flagged and treated as untrusted; do not claim the detector alone stops exfiltration.
@@ -459,7 +459,7 @@ Use the same T01–T20 identifiers as the full product roadmap. `MVP gate` ident
 | ID | Scenario | Expected result | MVP gate | Implemented | Tested/pass | Audited | Evidence |
 |---|---|---|---|---|---|---|---|
 | T01 | Missing, invalid or expired northbound token | Rejected before tool handler | Required | [ ] | [ ] | [ ] | |
-| T02 | Normal permitted Gmail search | Allowed through Aegis | Required | [ ] | [ ] | [ ] | |
+| T02 | Normal permitted Gmail search | Allowed through Trust Gate | Required | [ ] | [ ] | [ ] | |
 | T03 | Unpermitted tool/operation | Blocked; upstream counter unchanged | Required | [ ] | [ ] | [ ] | |
 | T04 | Sensitive Drive document returned | Policy-required fields redacted | Required | [ ] | [ ] | [ ] | |
 | T05 | DLP/response inspection unavailable | Raw response withheld; sanitized error only | Required | [ ] | [ ] | [ ] | |
@@ -477,7 +477,7 @@ Use the same T01–T20 identifiers as the full product roadmap. `MVP gate` ident
 | T17 | Policy engine unavailable | Protected operation fails closed | Required | [ ] | [ ] | [ ] | |
 | T18 | DLP unavailable | Response withheld and protected write blocked | Required | [ ] | [ ] | [ ] | |
 | T19 | Malicious email instructions | Flagged/untrusted; cannot alter policy/authorize follow-on call | Required | [ ] | [ ] | [ ] | |
-| T20 | Direct upstream bypass | Protected client configuration routes through Aegis only | Required | [ ] | [ ] | [ ] | |
+| T20 | Direct upstream bypass | Protected client configuration routes through Trust Gate only | Required | [ ] | [ ] | [ ] | |
 
 ### Test evidence record template
 
@@ -508,7 +508,7 @@ Use the same T01–T20 identifiers as the full product roadmap. `MVP gate` ident
 - [ ] Reset send counter to zero and clear old approvals/audit events.
 - [ ] Verify the bearer token works and a missing token is rejected.
 - [ ] Open the approval page and activity timeline.
-- [ ] Start the scripted demo client and verify it connects to Aegis, not directly to mocks.
+- [ ] Start the scripted demo client and verify it connects to Trust Gate, not directly to mocks.
 
 ## Scenario 1 — ordinary operation (30–45 seconds)
 
@@ -532,7 +532,7 @@ Show: content inspection flags suspicious instructions and marks the content unt
 
 Action: attempt `gmail_send_email` using the stable confidential `artifact_id` and an external recipient.
 
-Show: Aegis resolves taint → policy returns `REQUIRE_APPROVAL` → pending approval card appears → Gmail send counter remains zero → user rejects → counter remains zero.
+Show: Trust Gate resolves taint → policy returns `REQUIRE_APPROVAL` → pending approval card appears → Gmail send counter remains zero → user rejects → counter remains zero.
 
 ## Scenario 5 — exact legitimate approval (60–90 seconds)
 
@@ -542,7 +542,7 @@ Show: exact recipient/attachment/payload → user approves → frozen hash reval
 
 ## Closing proof points
 
-- [ ] Aegis was in the actual execution path.
+- [ ] Trust Gate was in the actual execution path.
 - [ ] The user identity was derived from authentication, not model input.
 - [ ] Sensitive response data was redacted before reaching the model/client.
 - [ ] Artifact lineage informed the outbound decision.
