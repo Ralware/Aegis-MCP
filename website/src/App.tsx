@@ -482,8 +482,8 @@ function Mark({ small = false }: { small?: boolean }) {
 function Brand({ to = "/" }: { to?: string }) {
   return (
     <a className="brand" href={to}>
-      <Mark />
-      <span>
+      <img className="brand-logo" src="/logo.png" alt="" aria-hidden="true" />
+      <span className="brand-name">
         trust<span className="brand-light">gate</span>
       </span>
     </a>
