@@ -250,5 +250,3 @@ Trust Gate cannot protect a connection that bypasses its gateway. External servi
 - [Docker Compose documentation](https://docs.docker.com/compose/)
 
 ---
-
-**Trust Gate development rule:** Prove authenticated gateway interception and upstream blocking first. Then prove response withholding and artifact taint. Then prove exact-operation approval. Expand the product only after these security properties are demonstrated with repeatable tests and evidence.
