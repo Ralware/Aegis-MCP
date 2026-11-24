@@ -3965,9 +3965,559 @@ body,
     margin: 0;
   }
 }
+
+/* Pitch-black visual system with restrained, layered near-black surfaces. */
+:root {
+  color: #f4f5f3;
+  background: #000;
+  --black: #000;
+  --surface: #050606;
+  --surface-2: #090b0a;
+  --line: #1b201d;
+  --muted: #949d97;
+  --sage: #b5d5c5;
+  --amber: #ddba80;
+  --red: #e08b83;
+}
+html,
+body,
+#root {
+  background-color: #000;
+  color: #f4f5f3;
+}
+body {
+  background: #000;
+}
+.site-frame,
+.public-header,
+.site-footer,
+.tech-strip,
+.editorial-section,
+.capability-section,
+.stack-section,
+.page-hero,
+.console-frame,
+.console-sidebar,
+.console-workspace-area,
+.console-topbar {
+  background-color: #000;
+}
+.site-frame {
+  border-color: #131513;
+  box-shadow: 0 36px 100px #000;
+}
+.architecture-band,
+.closing-cta {
+  background: linear-gradient(135deg, #000 0%, #030504 52%, #000 100%);
+}
+.pipeline-section,
+.demo-preview {
+  background: radial-gradient(ellipse at 78% 16%, #9fc3ae0c, transparent 48%), #000;
+}
+.hero {
+  background: #000;
+  border-color: #1b201d;
+}
+.page-hero:before {
+  background: radial-gradient(ellipse, #a9c4b510, transparent 70%);
+}
+.main-nav,
+.header-action,
+.mobile-menu,
+.pipeline-hint,
+.pill-link:not(.pill-primary),
+.collapse-button,
+.icon-button,
+.console-workspace,
+.console-topbar,
+.mode-result,
+.docs-group details > p,
+.console-content input,
+.console-content select,
+.audit-controls input,
+.audit-controls select {
+  background-color: #050606;
+  border-color: #1c221e;
+}
+.capability-tile,
+.mini-console,
+.flow-band > div,
+.arch-canvas,
+.component-detail,
+.pipeline-columns > div,
+.lineage-card,
+.docs-group,
+.table-wrap,
+.technology-note,
+.simulation-banner,
+.console-panel,
+.metric-card,
+.console-disclaimer,
+.guide-modal,
+.guide-steps > div {
+  background: #050606;
+  border-color: #1a201c;
+}
+.capability-tile:hover,
+.docs-group:hover,
+.console-panel:hover {
+  border-color: #36443b;
+  background-color: #080a09;
+}
+.flow-gateway,
+.arch-node,
+.gate-node,
+.mode-result,
+.console-workspace-area {
+  background-color: #070908;
+}
+.subnav-tabs .selected,
+.subnav-tabs > a:hover,
+.mode-bar > button.active,
+.filter-tabs button.active,
+.main-nav > a:hover,
+.main-nav > a.active,
+.console-sidebar nav button:hover,
+.console-sidebar nav button.active {
+  background-color: #101411;
+  border-color: #28332c;
+}
+.site-footer,
+.site-footer + * {
+  border-color: #171b18;
+}
+.tech-strip,
+.editorial-section,
+.architecture-band,
+.capability-section,
+.pipeline-section,
+.demo-preview,
+.stack-section,
+.closing-cta {
+  border-color: #171b18;
+}
+.table-wrap th,
+.table-wrap td,
+.console-panel-title,
+.console-table th,
+.console-table td {
+  border-color: #191e1b;
+}
+.console-frame {
+  border-color: #171b18;
+  box-shadow: 0 24px 80px #000;
+}
+.console-sidebar,
+.console-workspace-area,
+.console-topbar {
+  border-color: #171b18;
+}
+.console-panel,
+.metric-card {
+  box-shadow: 0 12px 32px #0006;
+}
+.hero-center > p,
+.page-hero > p,
+.editorial-copy > p,
+.band-heading > p,
+.section-title-row > p,
+.demo-preview-copy > p,
+.console-heading p {
+  color: #b1b8b3;
+}
+.eyebrow,
+.section-kicker {
+  color: #909a93;
+}
 @supports (min-height: 100dvh) {
   #root,
   .console-frame {
     min-height: 100dvh;
+  }
+}
+
+/* Theme controls: available site-wide without changing the dark default. */
+.header-actions {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 7px 11px;
+  border: 1px solid #303633;
+  border-radius: 99px;
+  background: #080a09;
+  color: #e6ebe7;
+  font-size: 10px;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.18s, border-color 0.18s, color 0.18s;
+}
+.theme-toggle:hover {
+  background: #151a17;
+  border-color: #58645c;
+}
+.theme-toggle-compact {
+  width: 30px;
+  min-width: 30px;
+  height: 30px;
+  min-height: 30px;
+  padding: 0;
+  border-radius: 7px;
+}
+@media (max-width: 760px) {
+  .header-actions {
+    grid-column: 3;
+    grid-row: 1;
+    gap: 5px;
+  }
+  .header-actions .theme-toggle:not(.theme-toggle-compact) {
+    width: 30px;
+    min-width: 30px;
+    min-height: 30px;
+    padding: 0;
+  }
+  .header-actions .theme-toggle > span {
+    display: none;
+  }
+  .header-actions .header-action {
+    padding: 8px 9px;
+    font-size: 8px;
+  }
+}
+
+/*
+ * Light mode is deliberately self-contained: it resets inherited dark colors,
+ * backgrounds and shadows before applying the white surface system below.
+ */
+html[data-theme="light"] {
+  color-scheme: light;
+  color: #1d2520;
+  background: #fff;
+  --black: #fff;
+  --surface: #f7f9f7;
+  --surface-2: #eef2ef;
+  --line: #d7dfd9;
+  --muted: #4d5a52;
+  --sage: #285e45;
+  --amber: #76520f;
+  --red: #9d3731;
+}
+html[data-theme="light"] *,
+html[data-theme="light"] *::before,
+html[data-theme="light"] *::after {
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+}
+html[data-theme="light"] * {
+  color: #1d2520 !important;
+  border-color: #d7dfd9 !important;
+}
+html[data-theme="light"],
+html[data-theme="light"] body,
+html[data-theme="light"] #root,
+html[data-theme="light"] .site-frame,
+html[data-theme="light"] .public-header,
+html[data-theme="light"] .site-footer,
+html[data-theme="light"] .tech-strip,
+html[data-theme="light"] .editorial-section,
+html[data-theme="light"] .capability-section,
+html[data-theme="light"] .stack-section,
+html[data-theme="light"] .page-hero,
+html[data-theme="light"] .console-frame,
+html[data-theme="light"] .console-sidebar,
+html[data-theme="light"] .console-workspace-area,
+html[data-theme="light"] .console-topbar,
+html[data-theme="light"] .console-content,
+html[data-theme="light"] .hero,
+html[data-theme="light"] .architecture-band,
+html[data-theme="light"] .closing-cta,
+html[data-theme="light"] .pipeline-section,
+html[data-theme="light"] .demo-preview {
+  background: #fff !important;
+  color: #1d2520 !important;
+}
+html[data-theme="light"] .site-frame,
+html[data-theme="light"] .console-frame {
+  border-color: #d7dfd9 !important;
+}
+html[data-theme="light"] .site-frame {
+  box-shadow: 0 20px 64px #1d25200d !important;
+}
+html[data-theme="light"] .capability-tile,
+html[data-theme="light"] .mini-console,
+html[data-theme="light"] .flow-band > div,
+html[data-theme="light"] .arch-canvas,
+html[data-theme="light"] .component-detail,
+html[data-theme="light"] .pipeline-columns > div,
+html[data-theme="light"] .lineage-card,
+html[data-theme="light"] .docs-group,
+html[data-theme="light"] .table-wrap,
+html[data-theme="light"] .technology-note,
+html[data-theme="light"] .simulation-banner,
+html[data-theme="light"] .console-panel,
+html[data-theme="light"] .metric-card,
+html[data-theme="light"] .console-disclaimer,
+html[data-theme="light"] .guide-modal,
+html[data-theme="light"] .guide-steps > div,
+html[data-theme="light"] .demo-aside,
+html[data-theme="light"] .approval-card,
+html[data-theme="light"] .panel,
+html[data-theme="light"] .scenario,
+html[data-theme="light"] .approval-facts,
+html[data-theme="light"] .rule-match,
+html[data-theme="light"] .active-scenario,
+html[data-theme="light"] .security-expanded,
+html[data-theme="light"] .phase-body,
+html[data-theme="light"] .arch-side,
+html[data-theme="light"] .mode-result {
+  background: #f7f9f7 !important;
+  border-color: #d7dfd9 !important;
+}
+html[data-theme="light"] .main-nav,
+html[data-theme="light"] .header-action,
+html[data-theme="light"] .theme-toggle,
+html[data-theme="light"] .mobile-menu,
+html[data-theme="light"] .pipeline-hint,
+html[data-theme="light"] .pill-link:not(.pill-primary),
+html[data-theme="light"] .collapse-button,
+html[data-theme="light"] .icon-button,
+html[data-theme="light"] .console-workspace,
+html[data-theme="light"] .console-topbar,
+html[data-theme="light"] .console-content input,
+html[data-theme="light"] .console-content select,
+html[data-theme="light"] .audit-controls input,
+html[data-theme="light"] .audit-controls select,
+html[data-theme="light"] .demo-toolbar select,
+html[data-theme="light"] .search-box,
+html[data-theme="light"] .search-box input,
+html[data-theme="light"] .small-control,
+html[data-theme="light"] .arch-module-list button,
+html[data-theme="light"] .subnav-tabs > a,
+html[data-theme="light"] .subnav-tabs > button,
+html[data-theme="light"] .mode-bar > button,
+html[data-theme="light"] .filter-tabs button,
+html[data-theme="light"] .security-row > button,
+html[data-theme="light"] .docs-group details > p,
+html[data-theme="light"] .console-approval > .approval-card,
+html[data-theme="light"] .frozen-args,
+html[data-theme="light"] .approval-facts,
+html[data-theme="light"] .workspace-avatar,
+html[data-theme="light"] .arch-node,
+html[data-theme="light"] .gate-node,
+html[data-theme="light"] .flow-gateway,
+html[data-theme="light"] .node-icon,
+html[data-theme="light"] .step-node,
+html[data-theme="light"] .phase-head,
+html[data-theme="light"] .panel pre,
+html[data-theme="light"] .text-button,
+html[data-theme="light"] .modal-close {
+  background: #fff !important;
+  border-color: #7f8b83 !important;
+}
+html[data-theme="light"] .main-nav > a:hover,
+html[data-theme="light"] .main-nav > a.active,
+html[data-theme="light"] .subnav-tabs .selected,
+html[data-theme="light"] .subnav-tabs > a:hover,
+html[data-theme="light"] .mode-bar > button.active,
+html[data-theme="light"] .filter-tabs button.active,
+html[data-theme="light"] .arch-module-list button.active,
+html[data-theme="light"] .console-sidebar nav button:hover,
+html[data-theme="light"] .console-sidebar nav button.active,
+html[data-theme="light"] .scenario:hover,
+html[data-theme="light"] .scenario.selected,
+html[data-theme="light"] .small-control:hover,
+html[data-theme="light"] .header-action:hover,
+html[data-theme="light"] .theme-toggle:hover,
+html[data-theme="light"] .mobile-menu:hover,
+html[data-theme="light"] .collapse-button:hover,
+html[data-theme="light"] .icon-button:hover {
+  background: #eaf0ec !important;
+  border-color: #7f8b83 !important;
+}
+html[data-theme="light"] .table-wrap th,
+html[data-theme="light"] .table-wrap td,
+html[data-theme="light"] .console-table th,
+html[data-theme="light"] .console-table td,
+html[data-theme="light"] .console-panel-title,
+html[data-theme="light"] .server-health,
+html[data-theme="light"] .recent-event,
+html[data-theme="light"] .state-metric,
+html[data-theme="light"] .sidebar-bottom,
+html[data-theme="light"] .server-meta,
+html[data-theme="light"] .quick-scenarios > button,
+html[data-theme="light"] .component-detail,
+html[data-theme="light"] .phase-body,
+html[data-theme="light"] .approval-facts,
+html[data-theme="light"] .frozen-args {
+  border-color: #d7dfd9 !important;
+}
+html[data-theme="light"] .pill-primary,
+html[data-theme="light"] .approval-actions button:last-child {
+  background: #285e45 !important;
+  border-color: #285e45 !important;
+  color: #fff !important;
+}
+html[data-theme="light"] .pill-primary svg,
+html[data-theme="light"] .approval-actions button:last-child svg {
+  color: #fff !important;
+}
+html[data-theme="light"] .status {
+  background: #edf1ee !important;
+  border-color: #cbd5ce !important;
+  color: #3c4a42 !important;
+}
+html[data-theme="light"] .status-planned,
+html[data-theme="light"] .status-not-run,
+html[data-theme="light"] .status-simulated,
+html[data-theme="light"] .status-simulated-pass,
+html[data-theme="light"] .status-allow,
+html[data-theme="light"] .status-connected,
+html[data-theme="light"] .status-consumed,
+html[data-theme="light"] .status-approved {
+  background: #e8f3ec !important;
+  border-color: #c4ddcc !important;
+  color: #245b3f !important;
+}
+html[data-theme="light"] .status-review,
+html[data-theme="light"] .status-pending,
+html[data-theme="light"] .status-require-approval {
+  background: #fbf3df !important;
+  border-color: #ead7a9 !important;
+  color: #704d0b !important;
+}
+html[data-theme="light"] .status-rejected,
+html[data-theme="light"] .status-block,
+html[data-theme="light"] .status-disabled,
+html[data-theme="light"] .danger-control {
+  background: #fae9e7 !important;
+  border-color: #eac4bf !important;
+  color: #9b3630 !important;
+}
+html[data-theme="light"] .brand-light,
+html[data-theme="light"] .eyebrow,
+html[data-theme="light"] .section-kicker,
+html[data-theme="light"] .synthetic-label,
+html[data-theme="light"] .console-env,
+html[data-theme="light"] .decision-large,
+html[data-theme="light"] .console-panel-title > button,
+html[data-theme="light"] .text-button,
+html[data-theme="light"] .security-row-title > svg,
+html[data-theme="light"] .console-sidebar nav button.active > svg {
+  color: #285e45 !important;
+}
+html[data-theme="light"] .threat-chip,
+html[data-theme="light"] .danger-control svg {
+  color: #9b3630 !important;
+}
+html[data-theme="light"] .approval-actions button:first-child {
+  background: #fbf3df !important;
+  border-color: #ead7a9 !important;
+  color: #704d0b !important;
+}
+html[data-theme="light"] .audit-controls input::placeholder,
+html[data-theme="light"] .console-content input::placeholder,
+html[data-theme="light"] .search-box input::placeholder {
+  color: #59655d !important;
+  opacity: 1;
+}
+html[data-theme="light"] .modal-backdrop {
+  background: #1d25204d !important;
+}
+html[data-theme="light"] .mark:before {
+  border-color: #101212;
+  border-right-color: transparent;
+  border-bottom-color: transparent;
+}
+html[data-theme="light"] .mark:after {
+  border-color: #111;
+  border-left-color: transparent;
+  border-top-color: transparent;
+}
+html[data-theme="light"] button:focus-visible,
+html[data-theme="light"] a:focus-visible,
+html[data-theme="light"] input:focus-visible,
+html[data-theme="light"] select:focus-visible {
+  outline-color: #285e45;
+}
+html[data-theme="light"] button:disabled {
+  opacity: 1 !important;
+  cursor: not-allowed;
+  background: #edf1ee !important;
+  border-color: #7f8b83 !important;
+  color: #3c4a42 !important;
+}
+html[data-theme="light"] .mark span {
+  background: #285e45 !important;
+}
+html[data-theme="light"] button,
+html[data-theme="light"] input,
+html[data-theme="light"] select,
+html[data-theme="light"] .header-action,
+html[data-theme="light"] .pill-link,
+html[data-theme="light"] .main-nav,
+html[data-theme="light"] .search-box {
+  border-color: #7f8b83 !important;
+}
+html[data-theme="light"] .live-dot,
+html[data-theme="light"] .connection-dot i,
+html[data-theme="light"] .console-env i,
+html[data-theme="light"] .synthetic-label i,
+html[data-theme="light"] .mini-console-head > span:first-child i,
+html[data-theme="light"] .audit-dot,
+html[data-theme="light"] .pipeline-line > div > i,
+html[data-theme="light"] .progress-track i,
+html[data-theme="light"] .chart-track i,
+html[data-theme="light"] .decision-legend i,
+html[data-theme="light"] .arch-connector i {
+  background: #285e45 !important;
+}
+html[data-theme="light"] .progress-track,
+html[data-theme="light"] .chart-track {
+  background: #dfe5e1 !important;
+}
+html[data-theme="light"] .chart-track .bar-require_approval,
+html[data-theme="light"] .legend-require_approval {
+  background: #76520f !important;
+}
+html[data-theme="light"] .chart-track .bar-block,
+html[data-theme="light"] .legend-block {
+  background: #9d3731 !important;
+}
+html[data-theme="light"] .step-active {
+  background: #e8f3ec !important;
+  color: #245b3f !important;
+}
+html[data-theme="light"] .brand-logo {
+  filter: brightness(0);
+}
+
+/* Brief route-entry motion gives each full-page navigation a soft handoff. */
+@keyframes route-enter {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+.site-frame,
+.console-frame {
+  animation: route-enter 240ms cubic-bezier(0.22, 0.61, 0.36, 1) backwards;
+}
+@media (prefers-reduced-motion: reduce) {
+  .site-frame,
+  .console-frame {
+    animation: none !important;
   }
 }

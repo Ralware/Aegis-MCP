@@ -41,6 +41,8 @@ import {
   ShieldAlert,
   ShieldCheck,
   SkipForward,
+  Sun,
+  Moon,
   TriangleAlert,
   Workflow,
   X,
@@ -68,6 +70,7 @@ const nav = [
   ["/technology", "Technology"],
   ["/roadmap", "Roadmap"],
 ] as const;
+type Theme = "dark" | "light";
 const routeNames: Record<string, string> = {
   "/": "Home",
   "/architecture": "Architecture",
@@ -519,6 +522,30 @@ function Status({ children }: { children: string }) {
     </span>
   );
 }
+function ThemeToggle({
+  theme,
+  onToggle,
+  compact = false,
+}: {
+  theme: Theme;
+  onToggle: () => void;
+  compact?: boolean;
+}) {
+  const nextTheme = theme === "dark" ? "light" : "dark";
+  return (
+    <button
+      type="button"
+      className={`theme-toggle${compact ? " theme-toggle-compact" : ""}`}
+      onClick={onToggle}
+      aria-label={`Switch to ${nextTheme} theme`}
+      title={`Switch to ${nextTheme} theme`}
+      aria-pressed={theme === "light"}
+    >
+      {theme === "dark" ? <Sun size={14} /> : <Moon size={14} />}
+      {!compact && <span>{theme === "dark" ? "Light" : "Dark"}</span>}
+    </button>
+  );
+}
 function Notice({ children }: { children: ReactNode }) {
   return (
     <div className="notice">
@@ -542,7 +569,15 @@ function TechStrip() {
     </div>
   );
 }
-function PublicHeader({ path }: { path: string }) {
+function PublicHeader({
+  path,
+  theme,
+  onToggleTheme,
+}: {
+  path: string;
+  theme: Theme;
+  onToggleTheme: () => void;
+}) {
   const [menu, setMenu] = useState(false);
   return (
     <header className="public-header">
@@ -573,9 +608,12 @@ function PublicHeader({ path }: { path: string }) {
           <span>Protection</span>
         </a>
       </nav>
-      <a className="header-action" href="/console">
-        Launch Console <ArrowUpRight size={14} />
-      </a>
+      <div className="header-actions">
+        <ThemeToggle theme={theme} onToggle={onToggleTheme} />
+        <a className="header-action" href="/console">
+          Launch Console <ArrowUpRight size={14} />
+        </a>
+      </div>
     </header>
   );
 }
@@ -592,10 +630,20 @@ function Footer() {
     </footer>
   );
 }
-function Shell({ path, children }: { path: string; children: ReactNode }) {
+function Shell({
+  path,
+  theme,
+  onToggleTheme,
+  children,
+}: {
+  path: string;
+  theme: Theme;
+  onToggleTheme: () => void;
+  children: ReactNode;
+}) {
   return (
     <main className="site-frame">
-      <PublicHeader path={path} />
+      <PublicHeader path={path} theme={theme} onToggleTheme={onToggleTheme} />
       {children}
       <Footer />
     </main>
@@ -2015,9 +2063,13 @@ const consoleItems = [
 function ConsolePage({
   state,
   setState,
+  theme,
+  onToggleTheme,
 }: {
   state: SimulationState;
   setState: Dispatch<SetStateAction<SimulationState>>;
+  theme: Theme;
+  onToggleTheme: () => void;
 }) {
   const [active, setActive] = useState(
       () => sessionStorage.getItem("tg-console-tab") || "Overview",
@@ -2137,6 +2189,7 @@ function ConsolePage({
             <b>{active}</b>
           </div>
           <div>
+            <ThemeToggle theme={theme} onToggle={onToggleTheme} compact />
             <span className="console-env">
               <i />
               LOCAL SIMULATION
@@ -3075,13 +3128,42 @@ export default function App() {
   const path = window.location.pathname.replace(/\/$/, "") || "/";
   const [state, setState] = useState<SimulationState>(() => loadState());
   const [guide, setGuide] = useState(false);
+  const [theme, setTheme] = useState<Theme>(() => {
+    try {
+      return localStorage.getItem("tg-theme") === "light" ? "light" : "dark";
+    } catch {
+      return "dark";
+    }
+  });
+  const toggleTheme = () =>
+    setTheme((current) => (current === "dark" ? "light" : "dark"));
   useEffect(() => saveState(state), [state]);
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    document.documentElement.style.colorScheme = theme;
+    try {
+      localStorage.setItem("tg-theme", theme);
+    } catch {
+      // The theme remains active for this page even if storage is unavailable.
+    }
+    document.querySelector('meta[name="theme-color"]')?.setAttribute(
+      "content",
+      theme === "light" ? "#ffffff" : "#000000",
+    );
+  }, [theme]);
   useEffect(() => {
     document.title = `${routeNames[path] ?? "Not found"} · Trust Gate`;
   }, [path]);
   let page: ReactNode;
   if (path === "/console")
-    page = <ConsolePage state={state} setState={setState} />;
+    page = (
+      <ConsolePage
+        state={state}
+        setState={setState}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+      />
+    );
   else {
     let content: ReactNode;
     switch (path) {
@@ -3109,7 +3191,15 @@ export default function App() {
       default:
         content = <NotFound />;
     }
-    page = <Shell path={path}>{content}</Shell>;
+    page = (
+      <Shell
+        path={path}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+      >
+        {content}
+      </Shell>
+    );
   }
   return (
     <>

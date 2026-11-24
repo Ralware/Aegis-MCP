@@ -4,6 +4,14 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="theme-color" content="#080909" />
+    <script>
+      try {
+        if (localStorage.getItem("tg-theme") === "light") {
+          document.documentElement.dataset.theme = "light";
+          document.querySelector('meta[name="theme-color"]')?.setAttribute("content", "#ffffff");
+        }
+      } catch {}
+    </script>
     <meta
       name="description"
       content="Trust Gate — an independent security boundary for AI agent tool execution."
