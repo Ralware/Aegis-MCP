@@ -1,0 +1,18 @@
+{
+  "rewrites": [
+    { "source": "/architecture", "destination": "/index.html" },
+    { "source": "/architecture/", "destination": "/index.html" },
+    { "source": "/security", "destination": "/index.html" },
+    { "source": "/security/", "destination": "/index.html" },
+    { "source": "/demo", "destination": "/index.html" },
+    { "source": "/demo/", "destination": "/index.html" },
+    { "source": "/technology", "destination": "/index.html" },
+    { "source": "/technology/", "destination": "/index.html" },
+    { "source": "/documentation", "destination": "/index.html" },
+    { "source": "/documentation/", "destination": "/index.html" },
+    { "source": "/roadmap", "destination": "/index.html" },
+    { "source": "/roadmap/", "destination": "/index.html" },
+    { "source": "/console", "destination": "/index.html" },
+    { "source": "/console/", "destination": "/index.html" }
+  ]
+}
