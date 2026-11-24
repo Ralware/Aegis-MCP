@@ -11,6 +11,7 @@ import {
   BookOpen,
   Braces,
   Check,
+  ChevronLeft,
   ChevronDown,
   ChevronRight,
   Clock3,
@@ -30,8 +31,6 @@ import {
   Mail,
   Menu,
   Network,
-  PanelLeftClose,
-  PanelLeftOpen,
   Play,
   Radio,
   RefreshCw,
@@ -2121,32 +2120,22 @@ function ConsolePage({
   };
   return (
     <div className={`console-frame ${collapsed ? "console-collapsed" : ""}`}>
-      <aside className="console-sidebar">
+      <aside id="console-sidebar" className="console-sidebar">
         <div className="console-brand-row">
-          <Brand to="/" />
+          {!collapsed && <Brand to="/" />}
           <button
+            type="button"
             className="collapse-button"
             onClick={() => setCollapsed(!collapsed)}
-            aria-label="Collapse sidebar"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-expanded={!collapsed}
+            aria-controls="console-sidebar"
+            title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
-            {collapsed ? (
-              <PanelLeftOpen size={16} />
-            ) : (
-              <PanelLeftClose size={16} />
-            )}
+            {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
           </button>
         </div>
-        <div className="console-workspace">
-          <span className="workspace-avatar">
-            <Mark small />
-          </span>
-          <span>
-            <b>Trust Gate</b>
-            <small>LOCAL SIMULATION</small>
-          </span>
-          <ChevronDown size={14} />
-        </div>
-        <span className="sidebar-label">WORKSPACE</span>
+        {!collapsed && <span className="sidebar-label">WORKSPACE</span>}
         <nav>
           {consoleItems.map(([x, Icon]) => (
             <button
@@ -2170,16 +2159,18 @@ function ConsolePage({
             </button>
           ))}
         </nav>
-        <div className="sidebar-bottom">
-          <div className="connection-dot">
-            <i />
-            SYNTHETIC FIXTURES
+        {!collapsed && (
+          <div className="sidebar-bottom">
+            <div className="connection-dot">
+              <i />
+              SYNTHETIC FIXTURES
+            </div>
+            <a href="/" className="back-site">
+              <ArrowLeft size={14} />
+              <span>Back To Showcase</span>
+            </a>
           </div>
-          <a href="/" className="back-site">
-            <ArrowLeft size={14} />
-            <span>Back to showcase</span>
-          </a>
-        </div>
+        )}
       </aside>
       <section className="console-workspace-area">
         <header className="console-topbar">
