@@ -1,0 +1,36 @@
+{
+    "routes": [
+        {
+            "path": "/",
+            "title": "Home"
+        },
+        {
+            "path": "/architecture",
+            "title": "Architecture"
+        },
+        {
+            "path": "/security",
+            "title": "Security"
+        },
+        {
+            "path": "/demo",
+            "title": "Demo"
+        },
+        {
+            "path": "/technology",
+            "title": "Technology"
+        },
+        {
+            "path": "/documentation",
+            "title": "Documentation"
+        },
+        {
+            "path": "/roadmap",
+            "title": "Roadmap"
+        },
+        {
+            "path": "/console",
+            "title": "Security Console"
+        }
+    ]
+}

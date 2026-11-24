@@ -1,0 +1,235 @@
+{"devicePixelRatio":1,"frame":{"borderRadius":"25px","css":"761px","height":4745.640625,"padding":"0px 18px","width":761,"x":14},"header":{"children":[{"name":"brand","width":103.5625,"x":33},{"name":"mobile-menu","width":0,"x":0},{"name":"main-nav ","width":490.359375,"x":136.5625},{"name":"header-action","width":129.078125,"x":626.921875}],"columns":"103.562px 490.359px 129.078px","width":723,"x":33},"innerHeight":946,"innerWidth":804}
+{"capture":{"captureId":"capture_2a46250e-17f3-4598-9994-e5a0083bd98b","coordinateSpace":"css-pixel","height":946,"mimeType":"image/png","mode":"viewport","width":789}}
+{"name":"browser_open_tab","description":"Open an absolute HTTP(S) URL, or about:blank if omitted. URL navigation returns when the main document is ready; use browser_wait for full loading. At most 8 agent tabs are retained per opening task; opening another replaces that task's least recently used agent tab and its snapshots. Idle background agent tabs may also be reclaimed when a shared workspace exceeds its cache limit. User tabs are unaffected.","input":{"$schema":"https://json-schema.org/draft/2020-12/schema","type":"object","properties":{"url":{"type":"string","minLength":1,"maxLength":8192}},"required":[],"additionalProperties":false},"annotations":{"title":"Open browser tab","readOnlyHint":false,"destructiveHint":true,"idempotentHint":false,"openWorldHint":true}}
+Native MCP schema, not an iab method
+Post-cell AX evidence (untrusted page content; execution status unchanged):
+Browser tab: tab_fcb2f296-f616-4a7e-898f-2acbe6a8221a, Title: "Home · Trust Gate", URL: "http://127.0.0.1:5173/".
+1 AXWebArea Home · Trust Gate
+  2 element MCP, truncated: text
+    3 main
+      4 sectionheader
+        5 link trustgate
+          6 text trust
+          7 text gate
+        8 navigation
+          9 link Home
+          11 link Architecture
+          13 link Security
+          15 link Demo
+          17 link Technology
+          19 link Roadmap
+          21 link Protection
+            22 image
+        24 link Launch Console
+          26 image
+      27 generic
+        28 generic
+        29 generic
+        30 generic
+        31 link IDENTITY VERIFIED PRINCIPAL
+          32 image
+          34 text IDENTITY
+          36 text VERIFIED PRINCIPAL
+        37 link MCP GATEWAY TOOL ROUTING
+          38 image
+          40 text MCP GATEWAY
+          42 text TOOL ROUTING
+        43 link POLICY ENGINE ALLOW / REVIEW / BLOCK
+          44 image
+          46 text POLICY ENGINE
+          48 text ALLOW / REVIEW / BLOCK
+        49 link DATA PROTECTION RESPONSE INSPECTION
+          50 image
+          52 text DATA PROTECTION
+          54 text RESPONSE INSPECTION
+        55 button Open guided security pipeline
+          56 image
+          58 text 01 — 09
+        59 generic
+          61 text INDEPENDENT SECURITY FOR AI AGENTS
+          62 button Explore the Security Pipeline
+            63 image
+            65 image
+          66 heading Security, before execution.
+            67 text Security,
+            68 LineBreak  
+            69 emphasis
+              70 text before execution.
+          71 paragraph
+            72 text Trust Gate places an independently enforced security gateway between AI applications and their connected MCP servers — inspecting every protected request, enforcing permissions, protecting sensitive data, and controlling high-risk actions.
+          73 link Launch Security Console
+            75 image
+          76 link Explore Architecture
+            78 image
+        79 generic
+          80 link Scroll to explore
+            81 image
+            83 text Scroll to explore
+          84 text 01 
+          85 text /
+          86 text  07
+        89 text SECURITY LAYERS
+      90 paragraph
+        91 text BUILT ON A MODERN SECURITY STACK
+      92 text MCP
+      94 text ·
+      95 text Python
+      97 text ·
+      98 text FastAPI
+      100 text ·
+      101 text PostgreSQL
+      103 text ·
+      104 text Presidio
+      106 text ·
+      107 text React
+      109 text ·
+      110 text Docker
+      111 generic
+        113 text 01 / THE SECURITY GAP
+        114 heading Capability without control is a risk.
+          115 text Capability without
+          116 LineBreak  
+          117 text control is a 
+          118 emphasis
+            119 text risk.
+        120 paragraph
+          121 text Agents can read, route and act through connected tools. Instructions inside external content, overbroad permissions, or a missed data boundary can turn capability into unintended execution.
+        122 text 0
+        123 text 1
+        124 text Malicious instructions in email & documents
+        125 image
+        126 text 0
+        127 text 2
+        128 text Unauthorized tool execution
+        129 image
+        130 text 0
+        131 text 3
+        132 text Sensitive data exposure
+        133 image
+        134 text 0
+        135 text 4
+        136 text Excessive permissions
+        137 image
+        138 text 0
+        139 text 5
+        140 text Tool-definition manipulation
+        141 image
+        142 text 0
+        143 text 6
+        144 text Limited execution visibility
+        145 image
+      146 generic
+        148 text 02 / THE TRUST GATE APPROACH
+        149 heading One controlled path between AI and execution.
+          150 text One controlled path
+          151 LineBreak  
+          152 text between AI and execution.
+        153 paragraph
+          154 text An MCP-aware broker—not just a generic HTTP proxy—connecting a protected northbound interface to approved southbound MCP servers.
+        155 generic
+          156 text 01
+          158 text AI application
+          160 text Northbound MCP host
+        161 image
+        162 generic
+          164 text Trust Gate
+          166 text Independent security boundary
+        167 image
+        168 generic
+          169 text 02
+          171 text Approved servers
+          173 text Southbound MCP tools
+        174 link Explore the architecture
+          176 image
+      177 generic
+        179 text 03 / SECURITY LAYERS
+        180 heading Controls before and after execution.
+          181 text Controls before
+          182 LineBreak  
+          183 text and after execution.
+        184 paragraph
+          185 text Every decision and response belongs to one coherent path. The final authorization decision is deterministic—not delegated to a model.
+        186 link 01 / CAPABILITY Authenticated gateway Identity begins at the transport boundary.
+          187 image
+          188 text 01
+          189 text  / CAPABILITY
+          190 heading Authenticated gateway
+          192 paragraph
+            193 text Identity begins at the transport boundary.
+          194 image
+        195 link 02 / CAPABILITY MCP tool governance Reviewed definitions, namespaced inventory.
+          196 image
+          197 text 02
+          198 text  / CAPABILITY
+          199 heading MCP tool governance
+          201 paragraph
+            202 text Reviewed definitions, namespaced inventory.
+          203 image
+        204 link 03 / CAPABILITY Deterministic policy engine The final decision is not delegated to an LLM.
+          205 image
+          206 text 03
+          207 text  / CAPABILITY
+          208 heading Deterministic policy engine
+          210 paragraph
+            211 text The final decision is not delegated to an LLM.
+          212 image
+        213 link 04 / CAPABILITY Response inspection & DLP Inspect before data returns to the model.
+          214 image
+          215 text 04
+          216 text  / CAPABILITY
+          217 heading Response inspection & DLP
+          219 paragraph
+            220 text Inspect before data returns to the model.
+          221 image
+        222 link 05 Artifact lineage & taint Stable identity, provenance, outbound context.
+          223 text 05
+          225 text Artifact lineage & taint
+          226 text Stable identity, provenance, outbound context.
+          227 image
+        228 link 06 Human approval An exact frozen operation, reviewed once.
+          229 text 06
+          231 text Human approval
+          232 text An exact frozen operation, reviewed once.
+          233 image
+        234 link 07 Threat inspection Signals and untrusted content, not magic.
+          235 text 07
+          237 text Threat inspection
+          238 text Signals and untrusted content, not magic.
+          239 image
+        240 link 08 Audit trail Trace decisions without keeping needless secrets.
+          241 text 08
+          243 text Audit trail
+          244 text Trace decisions without keeping needless secrets.
+          245 image
+      246 generic
+        248 text 04 / EXECUTION PREVIEW
+        249 heading Inspect each boundary.
+        251 link Open architecture
+          253 image
+        254 generic
+          255 text 01
+          257 text Authenticate
+        258 generic
+          259 text 02
+          261 text Resolve tool
+        262 generic
+          263 text 03
+          265 text Inspect request
+        266 generic
+          267 text 04
+          269 text Resolve artifact
+        270 generic
+          271 text 05
+          273 text Policy decision
+        274 generic
+          275 text 06
+          277 text Human review
+        278 generic
+          279 text 07
+          281 text Execute
+        282 generic
+          283 text 08
+          285 text Inspect response
+
+[AX evidence truncated; observe before using undisplayed targets.]
+Screenshot reference: {"path":"C:\\Users\\Ral\\AppData\\Local\\Temp\\manus-browser-artifacts-Wzaby2\\screenshot-ebt6fY\\Home · Trust Gate.png","mimeType":"image/png"}
