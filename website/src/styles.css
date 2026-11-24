@@ -3753,3 +3753,116 @@ code {
     grid-template-columns: 1fr;
   }
 }
+
+/* Give page chrome and information cards a consistent, deliberate gutter. */
+.site-frame {
+  padding: 0 clamp(16px, 3vw, 42px);
+}
+.public-header {
+  padding-inline: clamp(6px, 1vw, 14px);
+}
+.site-footer {
+  padding: 23px clamp(6px, 1vw, 14px) 26px;
+}
+.docs-group {
+  padding: 22px;
+}
+.capability-tile {
+  padding: 22px;
+}
+
+/* Keep the console within the viewport and let its content column shrink. */
+body {
+  overflow-x: clip;
+}
+.console-frame {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  grid-template-columns: minmax(0, 248px) minmax(0, 1fr);
+}
+.console-collapsed {
+  grid-template-columns: 68px minmax(0, 1fr);
+}
+.console-sidebar,
+.console-workspace-area,
+.console-content,
+.console-content > *,
+.metric-grid > *,
+.overview-grid > *,
+.server-cards > * {
+  min-width: 0;
+}
+.console-content {
+  width: 100%;
+  padding-inline: clamp(18px, 2.2vw, 32px);
+}
+.console-panel {
+  padding: 18px;
+}
+.metric-card {
+  padding: 16px;
+}
+
+@media (max-width: 1050px) {
+  .site-frame {
+    padding-inline: 24px;
+  }
+  .console-frame {
+    grid-template-columns: minmax(0, 215px) minmax(0, 1fr);
+  }
+  .console-collapsed {
+    grid-template-columns: 68px minmax(0, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .site-frame {
+    padding-inline: 14px;
+  }
+  .site-footer {
+    padding-inline: 6px;
+  }
+  .docs-group {
+    padding: 17px;
+  }
+  .capability-tile {
+    padding: 16px;
+  }
+  .console-frame,
+  .console-collapsed {
+    grid-template-columns: 57px minmax(0, 1fr);
+    margin: 0;
+  }
+  .console-content {
+    padding: 18px 12px 30px;
+  }
+  .console-panel {
+    padding: 13px;
+  }
+  .metric-card {
+    padding: 11px;
+  }
+  .console-topbar {
+    min-width: 0;
+    gap: 6px;
+    padding-inline: 9px;
+  }
+  .console-topbar > div {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 400px) {
+  .console-topbar .crumb,
+  .console-topbar > div:first-child > svg {
+    display: none;
+  }
+  .console-env {
+    font-size: 0;
+  }
+  .console-topbar > div:last-child {
+    gap: 8px;
+  }
+}
